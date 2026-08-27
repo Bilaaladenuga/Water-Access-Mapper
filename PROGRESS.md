@@ -1,8 +1,8 @@
 # Water Access Mapper - Progress Tracker
 
 ## Current Status
-- **Current Phase**: Phase 0 — Project Documentation
-- **Current Task**: Task 0.2 — Create PROGRESS.md
+- **Current Phase**: Phase 1 — Project Foundation
+- **Current Task**: Task 1.1 — Create Next.js frontend
 - **Last Updated**: 2026-08-27
 
 ---
