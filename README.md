@@ -54,33 +54,22 @@ This project demonstrates proficiency in:
 └─────────────────────────────────────┘
 ```
 
+## Technology Stack
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS |
+| Maps | MapLibre GL JS |
+| Backend | Python 3.10+, FastAPI |
+| Database | PostgreSQL, PostGIS, Supabase |
+| Geospatial | GeoPandas, Shapely, NumPy |
+| Routing | OSRM |
+
 ## Data Sources
 
 - [OpenStreetMap](https://www.openstreetmap.org/) - Water points, roads, boundaries
 - [Supabase](https://supabase.com/) - Managed PostgreSQL + PostGIS
 - [OSRM](http://project-osrm.org/) - Walking route calculations
-
-## Technology Stack
-
-| Component | Technology |
-|-----------|------------|
-| Frontend | Next.js, React, TypeScript, Tailwind CSS |
-| Maps | MapLibre GL JS |
-| Backend | Python, FastAPI |
-| Database | PostgreSQL, PostGIS, Supabase |
-| Geospatial | GeoPandas, Shapely, NumPy |
-| Routing | OSRM |
-
-## GIS Analysis
-
-[To be documented during implementation]
-
-## Limitations
-
-- Initial implementation uses sample data
-- Routing based on road network (not actual paths)
-- Single study area initially
-- No offline support
 
 ## Installation
 
@@ -89,65 +78,109 @@ This project demonstrates proficiency in:
 - Python 3.10+
 - Supabase account (free tier)
 
-### Setup
+### Quick Setup
 
-1. Clone the repository
+Run the setup script:
+```bash
+chmod +x scripts/setup.sh
+./scripts/setup.sh
+```
+
+### Manual Setup
+
+#### 1. Clone the repository
 ```bash
 git clone https://github.com/Bilaaladenuga/Water-Access-Mapper.git
 cd Water-Access-Mapper
 ```
 
-2. Set up frontend
+#### 2. Frontend (Next.js)
 ```bash
 cd apps/web
 npm install
-cp .env.example .env.local
-# Edit .env.local with your Supabase credentials
+cp .env.local.example .env.local
+# Edit .env.local with your settings
 npm run dev
 ```
+Frontend runs at: http://localhost:3000
 
-3. Set up backend
+#### 3. Backend (FastAPI)
 ```bash
 cd apps/api
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env with your credentials
+# Edit .env with your Supabase credentials
 uvicorn main:app --reload
 ```
+Backend runs at: http://localhost:8000
+API docs at: http://localhost:8000/docs
 
-4. Set up database
-- Create a Supabase project at [supabase.com](https://supabase.com)
-- Run migrations from `database/migrations/`
+#### 4. Database (Supabase)
+1. Create a project at [supabase.com](https://supabase.com)
+2. Copy your `SUPABASE_URL` and `SUPABASE_ANON_KEY` to `.env`
+3. Run migrations from `database/migrations/` (Phase 2)
+
+## Project Structure
+
+```
+water-access-mapper/
+├── apps/
+│   ├── web/           # Next.js frontend
+│   └── api/           # FastAPI backend
+├── geospatial/        # Python geospatial processing
+│   ├── ingestion/
+│   ├── cleaning/
+│   ├── analysis/
+│   └── routing/
+├── data/
+│   ├── raw/           # Original data files
+│   ├── processed/     # Cleaned data
+│   └── sample/        # Sample datasets
+├── database/
+│   └── migrations/    # SQL migration scripts
+├── scripts/           # Setup and utility scripts
+├── docs/              # Documentation
+├── tests/             # Test files
+├── PROJECT_SPEC.md    # Full project specification
+├── PROGRESS.md        # Task progress tracker
+└── README.md
+```
+
+## GIS Analysis
+
+[To be documented as features are implemented]
+
+## Limitations
+
+- Initial implementation uses sample data
+- Routing based on road network (not actual paths)
+- Single study area initially
+- No offline support
 
 ## Deployment
 
-### Frontend (Vercel)
-[To be documented]
+[To be configured in Phase 11]
 
-### Backend (Render/Railway)
-[To be documented]
-
-### Database (Supabase)
-[To be documented]
-
-## Environment Variables
-
-See `.env.example` for required environment variables.
+- Frontend → Vercel
+- Backend → Render/Railway
+- Database → Supabase
 
 ## Future Work
 
-- Mobile-responsive PWA
+- Mobile-responsive PWA for offline access
 - Multi-country support
 - Real-time WebSocket updates
 - Satellite imagery integration
 - Machine learning for water point detection
 - IoT integration for monitoring
-
-## License
-
-[Choose appropriate license]
 
 ---
 

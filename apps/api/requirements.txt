@@ -1,0 +1,33 @@
+# Web framework
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+
+# Environment management
+python-dotenv==1.0.1
+
+# Database
+sqlalchemy==2.0.31
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# Geospatial
+geopandas==0.14.4
+shapely==2.0.4
+fiona==1.9.6
+pyproj==3.6.1
+
+# Data processing
+pandas==2.2.2
+numpy==1.26.4
+
+# HTTP client (for OSRM routing)
+httpx==0.27.0
+
+# Validation
+pydantic==2.7.4
+pydantic-settings==2.3.4
+
+# Testing
+pytest==8.2.2
+pytest-asyncio==0.23.7
+httpx==0.27.0

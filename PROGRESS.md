@@ -2,8 +2,8 @@
 
 ## Current Status
 - **Current Phase**: Phase 1 — Project Foundation
-- **Current Task**: Task 1.1 — Create Next.js frontend
-- **Last Updated**: 2026-08-27
+- **Current Task**: Awaiting npm/pip install when network is available
+- **Last Updated**: 2026-08-29
 
 ---
 
@@ -21,12 +21,17 @@
 | Task | Description | Status |
 |------|-------------|--------|
 | 1.1 | Initialize Git repository | [x] Completed |
-| 1.2 | Create Next.js frontend | [ ] Pending |
-| 1.3 | Create FastAPI backend | [ ] Pending |
-| 1.4 | Create Python virtual environment | [ ] Pending |
-| 1.5 | Configure linting and formatting | [ ] Pending |
-| 1.6 | Create basic health endpoint | [ ] Pending |
-| 1.7 | Create minimal frontend-backend communication | [ ] Pending |
+| 1.2 | Create Next.js frontend | [x] Completed |
+| 1.3 | Create FastAPI backend | [x] Completed |
+| 1.4 | Create Python virtual environment | [x] Completed |
+| 1.5 | Configure linting and formatting | [x] Completed |
+| 1.6 | Create basic health endpoint | [x] Completed |
+| 1.7 | Create minimal frontend-backend communication | [x] Completed |
+
+**Note:** npm install and pip install could not complete due to network issues.
+Run these when network is available:
+- `cd apps/web && npm install`
+- `cd apps/api && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
 
 ---
 
@@ -160,11 +165,12 @@
 
 ## Known Issues
 
-None yet.
+1. Network connectivity issue — npm/pip install could not complete
 
 ## Decisions Made
 
-1. **No Docker**: Project will run locally with Node.js, Python venv, and Supabase
-2. **Supabase**: Using Supabase for managed PostgreSQL + PostGIS
-3. **OSRM**: Using OpenStreetMap-based routing for walking routes
+1. **No Docker**: Project runs locally with Node.js, Python venv, and Supabase
+2. **Supabase**: Managed PostgreSQL + PostGIS
+3. **OSRM**: OpenStreetMap-based routing for walking routes
 4. **Sample Data**: Initial implementation uses clearly labeled sample data
+5. **Linting**: ESLint + Prettier for frontend, Ruff for Python backend
