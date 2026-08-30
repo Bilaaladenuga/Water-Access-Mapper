@@ -68,6 +68,11 @@ async def database_status():
     return DatabaseStatus(**result)
 
 
+# Include API routes
+from routes.water_points import router as water_points_router
+app.include_router(water_points_router)
+
+
 @app.get("/")
 async def root():
     """Root endpoint with API information."""
@@ -77,4 +82,6 @@ async def root():
         "docs": "/docs",
         "health": "/health",
         "database": "/database",
+        "water_points": "/api/water-points/geojson",
+        "study_areas": "/api/study-areas/geojson",
     }

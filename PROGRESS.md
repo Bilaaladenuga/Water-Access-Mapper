@@ -1,8 +1,8 @@
 # Water Access Mapper - Progress Tracker
 
 ## Current Status
-- **Current Phase**: Phase 3 — Data Ingestion COMPLETE
-- **Current Task**: Ready for Phase 4
+- **Current Phase**: Phase 4 — Web GIS COMPLETE
+- **Current Task**: Ready for Phase 5
 - **Last Updated**: 2026-08-30
 
 ---
@@ -55,6 +55,7 @@
 | 3.4 | Detect duplicates | [x] Completed |
 | 3.5 | Clean invalid geometries | [x] Completed |
 | 3.6 | Import data into PostGIS | [x] Completed |
+| 3.7 | OSM integration (Overpass API) | [x] Completed |
 
 ---
 
@@ -62,12 +63,14 @@
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.1 | Create MapLibre map | [ ] Pending |
-| 4.2 | Display study area | [ ] Pending |
-| 4.3 | Display water points | [ ] Pending |
-| 4.4 | Create water-point popup | [ ] Pending |
-| 4.5 | Create map legend | [ ] Pending |
-| 4.6 | Create filters | [ ] Pending |
+| 4.1 | Create MapLibre map | [x] Completed |
+| 4.2 | Display study area | [x] Completed |
+| 4.3 | Display water points | [x] Completed |
+| 4.4 | Create water-point popup | [x] Completed |
+| 4.5 | Create map legend | [x] Completed |
+| 4.6 | Create filters | [x] Completed |
+
+**Note:** MapLibre GL JS map renders all 145 water points with OSM raster basemap. Study area polygon overlay. Click popups show name, type, status, source, coordinates. Color-by-type/status toggle. Stats bar and legend panel. API endpoints verified: `/api/water-points/geojson` (145 features), `/api/study-areas/geojson` (1 feature), `/api/water-points/stats`.
 
 ---
 
@@ -168,7 +171,9 @@
 ## Decisions Made
 
 1. **No Docker**: Project runs locally with Node.js, Python venv, and Supabase
-2. **Supabase**: Managed PostgreSQL + PostGIS
+2. **Neon**: Serverless PostgreSQL + PostGIS (migrated from Supabase)
 3. **OSRM**: OpenStreetMap-based routing for walking routes
 4. **Sample Data**: Initial implementation uses clearly labeled sample data
-5. **Linting**: ESLint + Prettier for frontend, Ruff for Python backend
+5. **OSM Integration**: Real water points from Overpass API (68 points)
+6. **Linting**: ESLint + Prettier for frontend, Ruff for Python backend
+7. **pnpm**: Used to work around Windows npm file-locking issues
