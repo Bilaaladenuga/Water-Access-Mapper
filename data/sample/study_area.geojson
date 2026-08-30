@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "name": "study_area_lagos",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lagos Mainland Study Area",
+        "description": "Lagos mainland area covering major residential districts including Ikeja, Surulere, Yaba, Lagos Island, and Lekki"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [3.25, 6.42],
+          [3.58, 6.42],
+          [3.58, 6.64],
+          [3.25, 6.64],
+          [3.25, 6.42]
+        ]]
+      }
+    }
+  ]
+}

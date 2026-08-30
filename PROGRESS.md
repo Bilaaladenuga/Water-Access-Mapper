@@ -1,8 +1,8 @@
 # Water Access Mapper - Progress Tracker
 
 ## Current Status
-- **Current Phase**: Phase 2 — Supabase + PostGIS COMPLETE
-- **Current Task**: Ready for Phase 3 (user needs to set up Supabase credentials)
+- **Current Phase**: Phase 3 — Data Ingestion COMPLETE
+- **Current Task**: Ready for Phase 4
 - **Last Updated**: 2026-08-30
 
 ---
@@ -49,12 +49,12 @@
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.1 | Create sample water-point dataset | [ ] Pending |
-| 3.2 | Create GeoJSON/CSV ingestion pipeline | [ ] Pending |
-| 3.3 | Validate coordinates | [ ] Pending |
-| 3.4 | Detect duplicates | [ ] Pending |
-| 3.5 | Clean invalid geometries | [ ] Pending |
-| 3.6 | Import data into PostGIS | [ ] Pending |
+| 3.1 | Create sample water-point dataset | [x] Completed |
+| 3.2 | Create GeoJSON/CSV ingestion pipeline | [x] Completed |
+| 3.3 | Validate coordinates | [x] Completed |
+| 3.4 | Detect duplicates | [x] Completed |
+| 3.5 | Clean invalid geometries | [x] Completed |
+| 3.6 | Import data into PostGIS | [x] Completed |
 
 ---
 
