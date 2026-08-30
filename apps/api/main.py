@@ -72,9 +72,11 @@ async def database_status():
 from routes.water_points import router as water_points_router
 from routes.spatial_queries import router as spatial_router
 from routes.routing import router as routing_router
+from routes.accessibility import router as accessibility_router
 app.include_router(water_points_router)
 app.include_router(spatial_router)
 app.include_router(routing_router)
+app.include_router(accessibility_router)
 
 
 @app.get("/")
@@ -97,5 +99,10 @@ async def root():
         "routing": {
             "to_nearest": "/api/routing/to-nearest?lat=6.5&lon=3.4",
             "to_point": "/api/routing/to-point?lat=6.5&lon=3.4&target_id=1",
+        },
+        "accessibility": {
+            "analysis": "/api/accessibility/analysis",
+            "underserved": "/api/accessibility/underserved",
+            "point_analysis": "/api/accessibility/point-analysis?lat=6.5&lon=3.4",
         },
     }
