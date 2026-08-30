@@ -71,8 +71,10 @@ async def database_status():
 # Include API routes
 from routes.water_points import router as water_points_router
 from routes.spatial_queries import router as spatial_router
+from routes.routing import router as routing_router
 app.include_router(water_points_router)
 app.include_router(spatial_router)
+app.include_router(routing_router)
 
 
 @app.get("/")
@@ -91,5 +93,9 @@ async def root():
             "within_radius": "/api/spatial/within-radius?lat=6.5&lon=3.4&radius_meters=1000",
             "analysis": "/api/spatial/analysis?lat=6.5&lon=3.4&radius_meters=1000",
             "density": "/api/spatial/density",
+        },
+        "routing": {
+            "to_nearest": "/api/routing/to-nearest?lat=6.5&lon=3.4",
+            "to_point": "/api/routing/to-point?lat=6.5&lon=3.4&target_id=1",
         },
     }

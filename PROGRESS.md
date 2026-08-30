@@ -1,8 +1,8 @@
 # Water Access Mapper - Progress Tracker
 
 ## Current Status
-- **Current Phase**: Phase 5 — Spatial Queries COMPLETE
-- **Current Task**: Ready for Phase 6
+- **Current Phase**: Phase 6 — Routing COMPLETE
+- **Current Task**: Ready for Phase 7
 - **Last Updated**: 2026-08-30
 
 ---
@@ -92,9 +92,11 @@
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 6.1 | User location to nearest water point | [ ] Pending |
-| 6.2 | Walking route calculation | [ ] Pending |
-| 6.3 | Distance and time estimation | [ ] Pending |
+| 6.1 | User location to nearest water point | [x] Completed |
+| 6.2 | Walking route calculation | [x] Completed |
+| 6.3 | Distance and time estimation | [x] Completed |
+
+**Note:** OSRM foot profile for realistic walking routes. Returns GeoJSON route geometry, network vs straight-line distance, and estimated walking time.
 
 ---
 
