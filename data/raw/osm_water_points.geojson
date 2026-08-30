@@ -1,0 +1,1298 @@
+{
+  "type": "FeatureCollection",
+  "name": "osm_water_points_lagos",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Clean Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.494245,
+        "longitude": 3.3885316,
+        "osm_id": 7376214198
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3885316,
+          6.494245
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Clean Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4953821,
+        "longitude": 3.3881906,
+        "osm_id": 7376214199
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3881906,
+          6.4953821
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Clean Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.493835,
+        "longitude": 3.389155,
+        "osm_id": 7376214201
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.389155,
+          6.493835
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Baale Aji Public water source",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4943065,
+        "longitude": 3.3883414,
+        "osm_id": 7376214204
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3883414,
+          6.4943065
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Clean Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4953433,
+        "longitude": 3.38808,
+        "osm_id": 7376214205
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.38808,
+          6.4953433
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ita Baale, borehole",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4959233,
+        "longitude": 3.3874933,
+        "osm_id": 7376214206
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3874933,
+          6.4959233
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Clean Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4943563,
+        "longitude": 3.3883579,
+        "osm_id": 7376214207
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3883579,
+          6.4943563
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Clean Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4943386,
+        "longitude": 3.3881976,
+        "osm_id": 7376214208
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3881976,
+          6.4943386
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ita Baale, borehole",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4959578,
+        "longitude": 3.3875668,
+        "osm_id": 7376214209
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3875668,
+          6.4959578
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Okerube/Pako bus Stop Public Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.528415,
+        "longitude": 3.2391134,
+        "osm_id": 12282701524
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2391134,
+          6.528415
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Public water points",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5221179,
+        "longitude": 3.2316252,
+        "osm_id": 12282701525
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2316252,
+          6.5221179
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Deep blue water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5242939,
+        "longitude": 3.2341035,
+        "osm_id": 12282701526
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2341035,
+          6.5242939
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Drinking well",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5236633,
+        "longitude": 3.2322933,
+        "osm_id": 12282701527
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2322933,
+          6.5236633
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Tape",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5259929,
+        "longitude": 3.2381062,
+        "osm_id": 12282701528
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2381062,
+          6.5259929
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Commercial water sales point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5290919,
+        "longitude": 3.2352896,
+        "osm_id": 12282701529
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2352896,
+          6.5290919
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Well Water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.527202,
+        "longitude": 3.229639,
+        "osm_id": 12282701530
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.229639,
+          6.527202
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Well",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5266357,
+        "longitude": 3.2304372,
+        "osm_id": 12282701531
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2304372,
+          6.5266357
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water well",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5273634,
+        "longitude": 3.2294458,
+        "osm_id": 12282701532
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2294458,
+          6.5273634
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Well",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5228371,
+        "longitude": 3.2308873,
+        "osm_id": 12287933418
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2308873,
+          6.5228371
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Public well",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5276956,
+        "longitude": 3.2292693,
+        "osm_id": 12287933419
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2292693,
+          6.5276956
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "CHAAY water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6881899,
+        "longitude": 3.2472261,
+        "osm_id": 4248414989
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.2472261,
+          6.6881899
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OSM Water Point 9202203071",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.57917,
+        "longitude": 3.4107347,
+        "osm_id": 9202203071
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4107347,
+          6.57917
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OSM Water Point 9202203072",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5795262,
+        "longitude": 3.4109495,
+        "osm_id": 9202203072
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4109495,
+          6.5795262
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OSM Water Point 9202203073",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5793911,
+        "longitude": 3.4109681,
+        "osm_id": 9202203073
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4109681,
+          6.5793911
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5990418,
+        "longitude": 3.4130082,
+        "osm_id": 12281536898
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4130082,
+          6.5990418
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Public water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6056662,
+        "longitude": 3.42513,
+        "osm_id": 12281536899
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.42513,
+          6.6056662
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Public water points",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6061862,
+        "longitude": 3.4311271,
+        "osm_id": 12281536900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4311271,
+          6.6061862
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5995154,
+        "longitude": 3.4273648,
+        "osm_id": 12281539801
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4273648,
+          6.5995154
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya lbeju",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6043173,
+        "longitude": 3.412831,
+        "osm_id": 12281539802
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.412831,
+          6.6043173
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Green gate water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6083045,
+        "longitude": 3.4231792,
+        "osm_id": 12281539803
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4231792,
+          6.6083045
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Babs okubadejo",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6072739,
+        "longitude": 3.4236911,
+        "osm_id": 12281539804
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4236911,
+          6.6072739
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya olomi",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6020759,
+        "longitude": 3.4244204,
+        "osm_id": 12281539805
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4244204,
+          6.6020759
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.602924,
+        "longitude": 3.4108157,
+        "osm_id": 12281539806
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4108157,
+          6.602924
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water vendors",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6009355,
+        "longitude": 3.41389,
+        "osm_id": 12281539807
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.41389,
+          6.6009355
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water pomp",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5996007,
+        "longitude": 3.4240234,
+        "osm_id": 12281539808
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4240234,
+          6.5996007
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya custom water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6061501,
+        "longitude": 3.4263199,
+        "osm_id": 12281539809
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4263199,
+          6.6061501
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya gbenga drinking water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6060038,
+        "longitude": 3.4310218,
+        "osm_id": 12281539810
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4310218,
+          6.6060038
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water vendor",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6069074,
+        "longitude": 3.4328636,
+        "osm_id": 12281539811
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4328636,
+          6.6069074
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Well Watet",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5997098,
+        "longitude": 3.4252079,
+        "osm_id": 12281539812
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4252079,
+          6.5997098
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water pomp",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6064989,
+        "longitude": 3.4260669,
+        "osm_id": 12281539813
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4260669,
+          6.6064989
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya David",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.606894,
+        "longitude": 3.4288991,
+        "osm_id": 12281539814
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4288991,
+          6.606894
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Joseph drinking water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6051077,
+        "longitude": 3.4290452,
+        "osm_id": 12281539815
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4290452,
+          6.6051077
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6034256,
+        "longitude": 3.4099405,
+        "osm_id": 12281539816
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4099405,
+          6.6034256
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6003154,
+        "longitude": 3.4271073,
+        "osm_id": 12281539817
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4271073,
+          6.6003154
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5984313,
+        "longitude": 3.423852,
+        "osm_id": 12281539818
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.423852,
+          6.5984313
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "New water tank",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5963706,
+        "longitude": 3.4258634,
+        "osm_id": 12281539819
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4258634,
+          6.5963706
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Oke oluwafisayo water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.59604,
+        "longitude": 3.4205507,
+        "osm_id": 12281539820
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4205507,
+          6.59604
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OSM Water Point 12281539821",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6080315,
+        "longitude": 3.4250422,
+        "osm_id": 12281539821
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4250422,
+          6.6080315
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya olomi",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.606163,
+        "longitude": 3.4263033,
+        "osm_id": 12281539822
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4263033,
+          6.606163
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya Ibeji",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6073217,
+        "longitude": 3.4313517,
+        "osm_id": 12281539823
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4313517,
+          6.6073217
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water tanks cleansing chemical",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6073835,
+        "longitude": 3.4086766,
+        "osm_id": 12281539824
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4086766,
+          6.6073835
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Old water tanks",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6023983,
+        "longitude": 3.4130683,
+        "osm_id": 12281539825
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4130683,
+          6.6023983
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Iya tobi drinking water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6038543,
+        "longitude": 3.417151,
+        "osm_id": 12281539826
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.417151,
+          6.6038543
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mama water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6068052,
+        "longitude": 3.4226107,
+        "osm_id": 12281539827
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4226107,
+          6.6068052
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6067096,
+        "longitude": 3.425035,
+        "osm_id": 12281539828
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.425035,
+          6.6067096
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Drinking",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6065683,
+        "longitude": 3.4260217,
+        "osm_id": 12281539829
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4260217,
+          6.6065683
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mama Israel drinking water",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6050633,
+        "longitude": 3.4301667,
+        "osm_id": 12281539830
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4301667,
+          6.6050633
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Drinking water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.600278,
+        "longitude": 3.4269809,
+        "osm_id": 12281539831
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4269809,
+          6.600278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5985575,
+        "longitude": 3.4260787,
+        "osm_id": 12281539832
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4260787,
+          6.5985575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5990096,
+        "longitude": 3.4257947,
+        "osm_id": 12281539833
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4257947,
+          6.5990096
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5986047,
+        "longitude": 3.4239317,
+        "osm_id": 12281539834
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4239317,
+          6.5986047
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5989023,
+        "longitude": 3.4247497,
+        "osm_id": 12281539835
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4247497,
+          6.5989023
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6052336,
+        "longitude": 3.4249866,
+        "osm_id": 12281539836
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4249866,
+          6.6052336
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water point",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6051992,
+        "longitude": 3.4194844,
+        "osm_id": 12281539837
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4194844,
+          6.6051992
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Well",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6058884,
+        "longitude": 3.4318308,
+        "osm_id": 12281539838
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4318308,
+          6.6058884
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "well",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.6059,
+        "longitude": 3.431767,
+        "osm_id": 12281589004
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.431767,
+          6.6059
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "community well",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.601859,
+        "longitude": 3.418862,
+        "osm_id": 12281589005
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.418862,
+          6.601859
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Water tanks",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5979519,
+        "longitude": 3.4229837,
+        "osm_id": 12282701523
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4229837,
+          6.5979519
+        ]
+      }
+    }
+  ]
+}
