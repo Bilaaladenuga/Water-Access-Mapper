@@ -4,9 +4,12 @@ Loads values from environment variables and .env file.
 """
 
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(env_file=",env", env_file_encoding="utf-8")
+
     # Database
     database_url: str = "postgresql://localhost:5432/water_access_mapper"
 
@@ -24,10 +27,6 @@ class Settings(BaseSettings):
 
     # Development
     debug: bool = True
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
 
 
 settings = Settings()

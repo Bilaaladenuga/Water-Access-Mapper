@@ -9,6 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
+from config import get_cors_origins
 
 app = FastAPI(
     title="Water Access Mapper API",
@@ -19,7 +20,7 @@ app = FastAPI(
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js dev server
+    allow_origins=get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,6 +49,25 @@ async def health_check():
     )
 
 
+class DatabaseStatus(BaseModel):
+    status: str
+    postgresql_version: str | None = None
+    postgis_version: str | None = None
+    error: str | None = None
+
+
+@app.get("/database", response_model=DatabaseStatus)
+async def database_status():
+    """
+    Check database connection and PostGIS availability.
+
+    Returns PostgreSQL version and PostGIS version if connected.
+    """
+    from database import check_db_connection
+    result = await check_db_connection()
+    return DatabaseStatus(**result)
+
+
 @app.get("/")
 async def root():
     """Root endpoint with API information."""
@@ -56,4 +76,5 @@ async def root():
         "version": "0.1.0",
         "docs": "/docs",
         "health": "/health",
+        "database": "/database",
     }
