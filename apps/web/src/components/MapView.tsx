@@ -293,6 +293,7 @@ export default function MapView() {
             </div>
           )
         )}
+        </div>
       </div>
 
       {/* Controls Panel */}
