@@ -1,21 +1,31 @@
 {
   "type": "FeatureCollection",
-  "name": "study_area_lagos",
+  "name": "study_area_lagos_state",
   "features": [
     {
       "type": "Feature",
       "properties": {
-        "name": "Lagos Mainland Study Area",
-        "description": "Lagos mainland area covering major residential districts including Ikeja, Surulere, Yaba, Lagos Island, and Lekki"
+        "name": "Lagos State Study Area",
+        "description": "Lagos State, Nigeria — covering all 20 Local Government Areas including Lagos Island, Ikeja, Ikorodu, Badagry, Epe, and Ibeju-Lekki. Total area approximately 3,577 km²."
       },
       "geometry": {
         "type": "Polygon",
         "coordinates": [[
-          [3.25, 6.42],
-          [3.58, 6.42],
-          [3.58, 6.64],
-          [3.25, 6.64],
-          [3.25, 6.42]
+          [2.70, 6.42],
+          [2.70, 6.70],
+          [2.85, 6.80],
+          [3.10, 6.90],
+          [3.50, 6.95],
+          [3.90, 6.92],
+          [4.20, 6.85],
+          [4.35, 6.70],
+          [4.35, 6.50],
+          [4.10, 6.40],
+          [3.80, 6.35],
+          [3.50, 6.32],
+          [3.20, 6.30],
+          [2.90, 6.35],
+          [2.70, 6.42]
         ]]
       }
     }
