@@ -35,29 +35,10 @@ export default function MapView() {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Initialize map centered on Lagos
+    // Initialize map centered on Lagos using OpenFreeMap (free, no API key)
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: {
-        version: 8,
-        sources: {
-          osm: {
-            type: "raster",
-            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-            tileSize: 256,
-            attribution: "© OpenStreetMap contributors",
-          },
-        },
-        layers: [
-          {
-            id: "osm-tiles",
-            type: "raster",
-            source: "osm",
-            minzoom: 0,
-            maxzoom: 19,
-          },
-        ],
-      },
+      style: "https://tiles.openfreemap.org/styles/liberty",
       center: [3.4, 6.5], // Lagos center
       zoom: 11,
     });
@@ -89,6 +70,9 @@ export default function MapView() {
     fetch(`${API_URL}/api/study-areas/geojson`)
       .then((res) => res.json())
       .then((data) => {
+        if (!data.features || data.features.length === 0) return;
+        if (map.current!.getSource("study-area")) return;
+
         map.current!.addSource("study-area", {
           type: "geojson",
           data: data,
@@ -99,21 +83,13 @@ export default function MapView() {
           type: "fill",
           source: "study-area",
           paint: {
-            "fill-color": "#2196F3",
-            "fill-opacity": 0.05,
+            "fill-color": "#1e40af",
+            "fill-opacity": 0.12,
           },
         });
 
-        map.current!.addLayer({
-          id: "study-area-outline",
-          type: "line",
-          source: "study-area",
-          paint: {
-            "line-color": "#2196F3",
-            "line-width": 2,
-            "line-dasharray": [5, 3],
-          },
-        });
+    
+
       })
       .catch((err) => console.error("Failed to load study area:", err));
   }
