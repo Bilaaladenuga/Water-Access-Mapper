@@ -83,8 +83,18 @@ export default function MapView() {
           type: "fill",
           source: "study-area",
           paint: {
-            "fill-color": "#1e40af",
-            "fill-opacity": 0.12,
+            "fill-color": "#f59e0b",
+            "fill-opacity": 0.15,
+          },
+        });
+
+        map.current!.addLayer({
+          id: "study-area-outline",
+          type: "line",
+          source: "study-area",
+          paint: {
+            "line-color": "#b45309",
+            "line-width": 2.5,
           },
         });
 
@@ -250,9 +260,20 @@ export default function MapView() {
           minWidth: 140,
         }}
       >
-        <div style={{ fontWeight: 600, marginBottom: 8 }}>
-          {colorBy === "type" ? "Water Type" : "Status"}
+        <div style={{ fontWeight: 600, marginBottom: 4, fontSize: 13 }}>
+          Study Area
         </div>
+        <div style={{ color: "#666", marginBottom: 8, fontSize: 11 }}>
+          Lagos State, Nigeria
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+          <span style={{ width: 14, height: 10, background: "#f59e0b", opacity: 0.5, border: "1.5px solid #b45309", borderRadius: 2, flexShrink: 0 }} />
+          <span>State boundary</span>
+        </div>
+        <div style={{ borderTop: "1px solid #e5e7eb", margin: "6px 0", paddingTop: 6 }}>
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>
+            {colorBy === "type" ? "Water Type" : "Status"}
+          </div>
         {Object.entries(colorBy === "type" ? WATER_TYPE_COLORS : STATUS_COLORS).map(
           ([key, color]) => (
             <div
