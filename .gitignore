@@ -49,3 +49,4 @@ npm-debug.log*
 
 # Supabase
 supabase/.temp/
+apps/web/next-*.tgz
