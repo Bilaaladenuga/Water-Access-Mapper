@@ -8,14 +8,10 @@ from pydantic import ConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = ConfigDict(env_file=",env", env_file_encoding="utf-8")
+    model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    # Database
+    # Database (Neon PostgreSQL + PostGIS)
     database_url: str = "postgresql://localhost:5432/water_access_mapper"
-
-    # Supabase
-    supabase_url: str = ""
-    supabase_anon_key: str = ""
 
     # OSRM routing
     osrm_base_url: str = "http://router.project-osrm.org"
