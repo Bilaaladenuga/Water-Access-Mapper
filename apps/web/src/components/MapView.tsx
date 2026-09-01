@@ -495,6 +495,12 @@ export default function MapView() {
           <div style={{ color: "#666", fontSize: 11 }}>
             {stats.by_source?.osm || 0} OSM · {stats.by_source?.sample || 0} Sample
           </div>
+          <a
+            href="/analytics"
+            style={{ color: "#1976D2", fontSize: 11, textDecoration: "none", fontWeight: 500 }}
+          >
+            📊 View Analytics →
+          </a>
         </div>
       )}
 
