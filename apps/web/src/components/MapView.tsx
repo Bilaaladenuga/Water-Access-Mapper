@@ -137,7 +137,7 @@ export default function MapView() {
                 colorBy === "type" ? WATER_TYPE_COLORS : STATUS_COLORS
               ).flatMap(([key, color]) => [key, color]),
               "#9E9E9E",
-            ],
+            ] as any,
             "circle-opacity": 0.9,
           },
         });
