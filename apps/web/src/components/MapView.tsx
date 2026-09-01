@@ -738,7 +738,7 @@ export default function MapView() {
         <div
           style={{
             position: "absolute",
-            top: 10,
+            top: 55,
             left: 10,
             background: "white",
             borderRadius: 8,
