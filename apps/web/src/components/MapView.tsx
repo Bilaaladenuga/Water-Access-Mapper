@@ -351,11 +351,11 @@ export default function MapView() {
       if (!res.ok) throw new Error("Report failed");
       if (popupRef.current) {
         popupRef.current.setHTML(
-          '<div style="font-family:system-ui,sans-serif;padding:8px;text-align:center;">
+          `<div style="font-family:system-ui,sans-serif;padding:8px;text-align:center;">
             <div style="font-size:24px;margin-bottom:4px;">✅</div>
             <b>Report submitted!</b>
             <p style="margin:4px 0 0;font-size:12px;color:#666;">Thank you for your report.</p>
-          </div>'
+          </div>`
         );
       }
     } catch (err) {
