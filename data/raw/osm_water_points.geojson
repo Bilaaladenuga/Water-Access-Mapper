@@ -385,6 +385,25 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Original Spot of the Slaves Spirit Attenuation Well",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.4004422,
+        "longitude": 2.8805203,
+        "osm_id": 14054779209
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.8805203,
+          6.4004422
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "CHAAY water",
         "water_type": "tap",
         "status": "unknown",
@@ -398,63 +417,6 @@
         "coordinates": [
           3.2472261,
           6.6881899
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "OSM Water Point 9202203071",
-        "water_type": "well",
-        "status": "unknown",
-        "source": "osm",
-        "latitude": 6.57917,
-        "longitude": 3.4107347,
-        "osm_id": 9202203071
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          3.4107347,
-          6.57917
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "OSM Water Point 9202203072",
-        "water_type": "well",
-        "status": "unknown",
-        "source": "osm",
-        "latitude": 6.5795262,
-        "longitude": 3.4109495,
-        "osm_id": 9202203072
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          3.4109495,
-          6.5795262
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "OSM Water Point 9202203073",
-        "water_type": "well",
-        "status": "unknown",
-        "source": "osm",
-        "latitude": 6.5793911,
-        "longitude": 3.4109681,
-        "osm_id": 9202203073
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          3.4109681,
-          6.5793911
         ]
       }
     },
@@ -898,7 +860,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "OSM Water Point 12281539821",
+        "name": "OSM 12281539821",
         "water_type": "tap",
         "status": "unknown",
         "source": "osm",
@@ -1240,6 +1202,82 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Water tanks",
+        "water_type": "tap",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5979519,
+        "longitude": 3.4229837,
+        "osm_id": 12282701523
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4229837,
+          6.5979519
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OSM 9202203071",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.57917,
+        "longitude": 3.4107347,
+        "osm_id": 9202203071
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4107347,
+          6.57917
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OSM 9202203072",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5795262,
+        "longitude": 3.4109495,
+        "osm_id": 9202203072
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4109495,
+          6.5795262
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "OSM 9202203073",
+        "water_type": "well",
+        "status": "unknown",
+        "source": "osm",
+        "latitude": 6.5793911,
+        "longitude": 3.4109681,
+        "osm_id": 9202203073
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.4109681,
+          6.5793911
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "well",
         "water_type": "well",
         "status": "unknown",
@@ -1272,25 +1310,6 @@
         "coordinates": [
           3.418862,
           6.601859
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Water tanks",
-        "water_type": "tap",
-        "status": "unknown",
-        "source": "osm",
-        "latitude": 6.5979519,
-        "longitude": 3.4229837,
-        "osm_id": 12282701523
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          3.4229837,
-          6.5979519
         ]
       }
     }
