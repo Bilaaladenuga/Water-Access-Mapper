@@ -75,12 +75,14 @@ from routes.routing import router as routing_router
 from routes.accessibility import router as accessibility_router
 from routes.crowdsourcing import router as crowdsourcing_router
 from routes.analytics import router as analytics_router
+from routes.water_quality import router as quality_router
 app.include_router(water_points_router)
 app.include_router(spatial_router)
 app.include_router(routing_router)
 app.include_router(accessibility_router)
 app.include_router(crowdsourcing_router)
 app.include_router(analytics_router)
+app.include_router(quality_router)
 
 
 @app.get("/")

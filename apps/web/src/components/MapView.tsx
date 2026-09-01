@@ -32,6 +32,7 @@ export default function MapView() {
   const [stats, setStats] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [routing, setRouting] = useState(false);
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const [submitMode, setSubmitMode] = useState(false);
   const [submitForm, setSubmitForm] = useState<{
     show: boolean;
@@ -142,6 +143,55 @@ export default function MapView() {
           },
         });
 
+        // Add heatmap layer (hidden by default)
+        map.current!.addLayer({
+          id: "water-points-heatmap",
+          type: "heatmap",
+          source: "water-points",
+          maxzoom: 15,
+          paint: {
+            "heatmap-weight": [
+              "interpolate",
+              ["linear"],
+              ["get", "importance"],
+              0, 0,
+              6, 1,
+            ],
+            "heatmap-intensity": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              0, 1,
+              15, 3,
+            ],
+            "heatmap-color": [
+              "interpolate",
+              ["linear"],
+              ["heatmap-density"],
+              0, "rgba(33,102,174,0)",
+              0.2, "rgb(103,169,205)",
+              0.4, "rgb(209,229,240)",
+              0.6, "rgb(253,219,199)",
+              0.8, "rgb(244,109,67)",
+              1, "rgb(165,0,38)",
+            ],
+            "heatmap-radius": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              0, 2,
+              15, 20,
+            ],
+            "heatmap-opacity": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              14, 0.8,
+              15, 0,
+            ],
+          },
+        });
+
         // Popup on click
         const popup = new maplibregl.Popup({
           closeButton: true,
@@ -195,6 +245,39 @@ export default function MapView() {
           `;
 
           popup.setLngLat(coords).setHTML(html).addTo(map.current!);
+
+          // Fetch water quality data and add to popup
+          fetch(`${API_URL}/api/water-quality/point/${props.id}`)
+            .then((r) => r.json())
+            .then((qData) => {
+              if (qData.count > 0 && popupRef.current) {
+                const q = qData.quality[0]; // latest result
+                const statusColor = q.status === "good" ? "#4CAF50" : q.status === "moderate" ? "#FF9800" : "#F44336";
+                const qualityHtml = `
+                  <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                      <span style="font-weight:600;font-size:12px;">💧 Water Quality</span>
+                      <span style="background:${statusColor};color:white;padding:1px 6px;border-radius:10px;font-size:10px;text-transform:capitalize;">${q.status}</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:11px;color:#555;">
+                      <span>pH:</span><span>${q.ph?.toFixed(1) ?? "—"}</span>
+                      <span>Turbidity:</span><span>${q.turbidity?.toFixed(1) ?? "—"} NTU</span>
+                      <span>Coliform:</span><span>${q.coliform_count ?? "—"} CFU/100ml</span>
+                      <span>Tested:</span><span>${q.test_date ?? "—"}</span>
+                    </div>
+                  </div>
+                `;
+                // Append quality section to the popup
+                const popupEl = popupRef.current.getElement();
+                const contentEl = popupEl?.querySelector('.maplibregl-popup-content');
+                if (contentEl) {
+                  const div = document.createElement('div');
+                  div.innerHTML = qualityHtml;
+                  contentEl.appendChild(div);
+                }
+              }
+            })
+            .catch(() => {}); // Ignore errors — quality data is optional
 
           // Attach button handlers after popup renders
           setTimeout(() => {
@@ -571,6 +654,37 @@ export default function MapView() {
           }}
         >
           📍 My Location
+        </button>
+
+        <button
+          onClick={() => {
+            const next = !showHeatmap;
+            setShowHeatmap(next);
+            if (map.current) {
+              map.current.setLayoutProperty(
+                "water-points-heatmap",
+                "visibility",
+                next ? "visible" : "none"
+              );
+              map.current.setLayoutProperty(
+                "water-points-circle",
+                "visibility",
+                next ? "none" : "visible"
+              );
+            }
+          }}
+          style={{
+            padding: "4px 10px",
+            borderRadius: 4,
+            border: showHeatmap ? "1px solid #F44336" : "1px solid #607D8B",
+            background: showHeatmap ? "#F44336" : "#607D8B",
+            color: "white",
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 600,
+          }}
+        >
+          {showHeatmap ? "🔥 Heatmap ON" : "🗺️ Points"}
         </button>
 
         <button
