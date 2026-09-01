@@ -150,6 +150,7 @@ export default function MapView() {
           id: "water-points-heatmap",
           type: "heatmap",
           source: "water-points",
+          layout: { visibility: "none" },
           maxzoom: 15,
           paint: {
             "heatmap-weight": [
