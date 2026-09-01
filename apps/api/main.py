@@ -76,6 +76,8 @@ from routes.accessibility import router as accessibility_router
 from routes.crowdsourcing import router as crowdsourcing_router
 from routes.analytics import router as analytics_router
 from routes.water_quality import router as quality_router
+from routes.export import router as export_router
+from routes.lga_analytics import router as lga_router
 app.include_router(water_points_router)
 app.include_router(spatial_router)
 app.include_router(routing_router)
@@ -83,6 +85,8 @@ app.include_router(accessibility_router)
 app.include_router(crowdsourcing_router)
 app.include_router(analytics_router)
 app.include_router(quality_router)
+app.include_router(export_router)
+app.include_router(lga_router)
 
 
 @app.get("/")

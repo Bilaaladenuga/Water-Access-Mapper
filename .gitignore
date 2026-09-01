@@ -53,3 +53,8 @@ apps/web/next-*.tgz
 
 # Raw data (large files)
 data/raw/
+data/raw/boundaries/lagos_lgas.geojson
+data/raw/boundaries/nga_admin_boundaries.geojson.zip
+data/raw/osm_all_lagos_raw.json
+data/raw/osm_water_points_expanded.geojson
+scripts/fetch_lga_water_points.py

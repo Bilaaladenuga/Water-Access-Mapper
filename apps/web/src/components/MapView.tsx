@@ -43,6 +43,12 @@ export default function MapView() {
     description: string;
   }>({ show: false, lat: 0, lon: 0, name: "", water_type: "tap", description: "" });
 
+  // Search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<
+    { display_name: string; lat: number; lon: number }[]
+  >([]);
+
   // Store water points data for filtering
   const waterPointsData = useRef<any>(null);
   const submitModeRef = useRef(false);
@@ -66,6 +72,7 @@ export default function MapView() {
 
     map.current.on("load", () => {
       loadStudyArea();
+      loadLGABoundaries();
       loadWaterPoints();
     });
 
@@ -87,6 +94,34 @@ export default function MapView() {
       .then((data) => setStats(data))
       .catch((err) => console.error("Failed to fetch stats:", err));
   }, []);
+
+  async function handleSearch() {
+    if (!searchQuery.trim()) return;
+    try {
+      const q = encodeURIComponent(searchQuery + ", Lagos, Nigeria");
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=5&countrycodes=ng`,
+        { headers: { "User-Agent": "WaterAccessMapper/1.0" } }
+      );
+      const results = await res.json();
+      setSearchResults(
+        results.map((r: any) => ({
+          display_name: r.display_name,
+          lat: parseFloat(r.lat),
+          lon: parseFloat(r.lon),
+        }))
+      );
+      if (results.length === 1) {
+        map.current?.flyTo({
+          center: [parseFloat(results[0].lon), parseFloat(results[0].lat)],
+          zoom: 15,
+        });
+        setSearchQuery(results[0].display_name);
+      }
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
+  }
 
   function loadStudyArea() {
     if (!map.current) return;
@@ -114,6 +149,58 @@ export default function MapView() {
         });
       })
       .catch((err) => console.error("Failed to load study area:", err));
+  }
+
+  function loadLGABoundaries() {
+    if (!map.current) return;
+
+    fetch(`${API_URL}/api/lga/boundaries`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.features || data.features.length === 0) return;
+        if (map.current!.getSource("lga-boundaries")) return;
+
+        map.current!.addSource("lga-boundaries", { type: "geojson", data });
+
+        // LGA fill — subtle blue tint
+        map.current!.addLayer({
+          id: "lga-fill",
+          type: "fill",
+          source: "lga-boundaries",
+          paint: { "fill-color": "#3b82f6", "fill-opacity": 0.06 },
+        });
+
+        // LGA labels
+        map.current!.addLayer({
+          id: "lga-labels",
+          type: "symbol",
+          source: "lga-boundaries",
+          layout: {
+            "text-field": ["get", "name"],
+            "text-size": 10,
+            "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+            "text-allow-overlap": false,
+          },
+          paint: {
+            "text-color": "#1e3a5f",
+            "text-halo-color": "white",
+            "text-halo-width": 1.5,
+          },
+        });
+
+        // LGA outline on hover
+        map.current!.addLayer({
+          id: "lga-outline",
+          type: "line",
+          source: "lga-boundaries",
+          paint: {
+            "line-color": "#3b82f6",
+            "line-width": 1,
+            "line-opacity": 0.5,
+          },
+        });
+      })
+      .catch((err) => console.error("Failed to load LGA boundaries:", err));
   }
 
   function loadWaterPoints() {
@@ -561,6 +648,91 @@ export default function MapView() {
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
       <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
 
+      {/* Search Bar */}
+      <div
+        style={{
+          position: "absolute",
+          top: 10,
+          left: 50,
+          zIndex: 10,
+          display: "flex",
+          gap: 0,
+        }}
+      >
+        <input
+          type="text"
+          placeholder="🔍 Search location in Lagos..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
+          }}
+          style={{
+            width: 280,
+            padding: "8px 12px",
+            borderRadius: "6px 0 0 6px",
+            border: "1px solid #ccc",
+            fontSize: 13,
+            outline: "none",
+          }}
+        />
+        <button
+          onClick={handleSearch}
+          style={{
+            padding: "8px 12px",
+            borderRadius: "0 6px 6px 0",
+            border: "1px solid #ccc",
+            borderLeft: "none",
+            background: "#2196F3",
+            color: "white",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
+          Go
+        </button>
+      </div>
+
+      {/* Search Results */}
+      {searchResults.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            top: 45,
+            left: 50,
+            zIndex: 11,
+            background: "white",
+            borderRadius: 6,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            maxHeight: 200,
+            overflowY: "auto",
+            width: 280,
+          }}
+        >
+          {searchResults.map((r, i) => (
+            <div
+              key={i}
+              onClick={() => {
+                map.current?.flyTo({ center: [r.lon, r.lat], zoom: 15 });
+                setSearchResults([]);
+                setSearchQuery(r.display_name);
+              }}
+              style={{
+                padding: "8px 12px",
+                cursor: "pointer",
+                borderBottom: "1px solid #f0f0f0",
+                fontSize: 12,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f5f5")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "white")}
+            >
+              {r.display_name}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Stats Bar */}
       {stats && (
         <div
@@ -584,9 +756,15 @@ export default function MapView() {
           </div>
           <a
             href="/analytics"
-            style={{ color: "#1976D2", fontSize: 11, textDecoration: "none", fontWeight: 500 }}
+            style={{ color: "#1976D2", fontSize: 11, textDecoration: "none", fontWeight: 500, display: "block" }}
           >
             📊 View Analytics →
+          </a>
+          <a
+            href="/lga"
+            style={{ color: "#7B1FA2", fontSize: 11, textDecoration: "none", fontWeight: 500, display: "block", marginTop: 2 }}
+          >
+            🏛️ LGA Breakdown →
           </a>
         </div>
       )}
@@ -713,6 +891,48 @@ export default function MapView() {
         {routing && (
           <span style={{ color: "#1976D2", fontSize: 11 }}>Calculating route...</span>
         )}
+
+        <div style={{ borderTop: "1px solid #e0e0e0", margin: "6px 0" }} />
+
+        <a
+          href="http://localhost:8000/api/export/geojson"
+          download="water_points_lagos.geojson"
+          style={{
+            display: "block",
+            padding: "4px 10px",
+            borderRadius: 4,
+            border: "1px solid #4CAF50",
+            background: "#4CAF50",
+            color: "white",
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 600,
+            textDecoration: "none",
+            textAlign: "center",
+            marginBottom: 4,
+          }}
+        >
+          📥 Export GeoJSON
+        </a>
+        <a
+          href="http://localhost:8000/api/export/csv"
+          download="water_points_lagos.csv"
+          style={{
+            display: "block",
+            padding: "4px 10px",
+            borderRadius: 4,
+            border: "1px solid #FF9800",
+            background: "#FF9800",
+            color: "white",
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 600,
+            textDecoration: "none",
+            textAlign: "center",
+          }}
+        >
+          📥 Export CSV
+        </a>
       </div>
 
       {/* Legend */}
