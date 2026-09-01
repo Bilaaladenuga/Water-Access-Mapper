@@ -50,3 +50,6 @@ npm-debug.log*
 # Supabase
 supabase/.temp/
 apps/web/next-*.tgz
+
+# Raw data (large files)
+data/raw/

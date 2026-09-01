@@ -20,12 +20,13 @@ VALID_WATER_TYPES = {"well", "tap", "spring", "borehole", "rainwater", "other"}
 # Valid statuses
 VALID_STATUSES = {"operational", "broken", "unknown", "abandoned"}
 
-# Study area bounds for Lagos (approximate)
+# Study area bounds for Lagos State (from GADM 4.1 official boundary)
+# Actual bounds: lon 2.7063-4.3482, lat 6.3732-6.7070
 STUDY_AREA_BOUNDS = {
-    "min_lon": 3.0,
-    "max_lon": 4.5,
-    "min_lat": 6.3,
-    "max_lat": 6.8,
+    "min_lon": 2.7,
+    "max_lon": 4.4,
+    "min_lat": 6.35,
+    "max_lat": 6.75,
 }
 
 
