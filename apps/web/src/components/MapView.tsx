@@ -44,6 +44,10 @@ export default function MapView() {
 
   // Store water points data for filtering
   const waterPointsData = useRef<any>(null);
+  const submitModeRef = useRef(false);
+
+  // Keep ref in sync with state
+  useEffect(() => { submitModeRef.current = submitMode; }, [submitMode]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -64,7 +68,7 @@ export default function MapView() {
 
     // Handle map click for submit mode
     map.current.on("click", (e) => {
-      if (!submitMode) return;
+      if (!submitModeRef.current) return;
       const { lng, lat } = e.lngLat;
       setSubmitForm({ show: true, lat, lon: lng, name: "", water_type: "tap", description: "" });
     });
