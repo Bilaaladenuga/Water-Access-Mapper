@@ -47,8 +47,10 @@ export default function MapView() {
   const waterPointsData = useRef<any>(null);
   const submitModeRef = useRef(false);
 
-  // Keep ref in sync with state
+  // Keep refs in sync with state
   useEffect(() => { submitModeRef.current = submitMode; }, [submitMode]);
+  const userLocationRef = useRef<[number, number] | null>(null);
+  useEffect(() => { userLocationRef.current = userLocation; }, [userLocation]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -304,8 +306,9 @@ export default function MapView() {
       setRouting(true);
 
       // Use user location or default (Ikeja)
-      const lat = userLocation?.[1] || 6.6018;
-      const lon = userLocation?.[0] || 3.3515;
+      const loc = userLocationRef.current;
+      const lat = loc?.[1] || 6.6018;
+      const lon = loc?.[0] || 3.3515;
 
       try {
         const res = await fetch(
@@ -377,7 +380,7 @@ export default function MapView() {
         setRouting(false);
       }
     },
-    [userLocation]
+    []
   );
 
   function clearRoute() {
