@@ -32,6 +32,15 @@ export default function MapView() {
   const [stats, setStats] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [routing, setRouting] = useState(false);
+  const [submitMode, setSubmitMode] = useState(false);
+  const [submitForm, setSubmitForm] = useState<{
+    show: boolean;
+    lat: number;
+    lon: number;
+    name: string;
+    water_type: string;
+    description: string;
+  }>({ show: false, lat: 0, lon: 0, name: "", water_type: "tap", description: "" });
 
   // Store water points data for filtering
   const waterPointsData = useRef<any>(null);
@@ -51,6 +60,13 @@ export default function MapView() {
     map.current.on("load", () => {
       loadStudyArea();
       loadWaterPoints();
+    });
+
+    // Handle map click for submit mode
+    map.current.on("click", (e) => {
+      if (!submitMode) return;
+      const { lng, lat } = e.lngLat;
+      setSubmitForm({ show: true, lat, lon: lng, name: "", water_type: "tap", description: "" });
     });
 
     return () => {
@@ -161,21 +177,27 @@ export default function MapView() {
                 <span style="font-weight:500;color:#666;">Coords:</span>
                 <span>${props.latitude?.toFixed(4)}, ${props.longitude?.toFixed(4)}</span>
               </div>
-              <button id="route-btn" style="
-                width:100%;padding:8px;background:#1976D2;color:white;border:none;border-radius:6px;
-                cursor:pointer;font-size:12px;font-weight:600;
-              ">📍 Get Walking Route</button>
+              <div style="display:flex;gap:6px;margin-top:8px;">
+                <button id="route-btn" style="
+                  flex:1;padding:8px;background:#1976D2;color:white;border:none;border-radius:6px;
+                  cursor:pointer;font-size:12px;font-weight:600;
+                ">📍 Route</button>
+                <button id="report-btn" style="
+                  flex:1;padding:8px;background:#F44336;color:white;border:none;border-radius:6px;
+                  cursor:pointer;font-size:12px;font-weight:600;
+                ">⚠️ Report</button>
+              </div>
             </div>
           `;
 
           popup.setLngLat(coords).setHTML(html).addTo(map.current!);
 
-          // Attach route button handler after popup renders
+          // Attach button handlers after popup renders
           setTimeout(() => {
-            const btn = document.getElementById("route-btn");
-            if (btn) {
-              btn.onclick = () => getRoute(props.id, coords);
-            }
+            const routeBtn = document.getElementById("route-btn");
+            if (routeBtn) routeBtn.onclick = () => getRoute(props.id, coords);
+            const reportBtn = document.getElementById("report-btn");
+            if (reportBtn) reportBtn.onclick = () => showReportForm(props.id, props.name);
           }, 50);
         });
 
@@ -278,6 +300,94 @@ export default function MapView() {
       map.current.removeSource("route");
     }
     popupRef.current?.remove();
+  }
+
+  function showReportForm(pointId: string, pointName: string) {
+    setSubmitForm({ show: true, lat: 0, lon: 0, name: "", water_type: "", description: "" });
+    // Show report form in popup
+    if (popupRef.current) {
+      const html = `
+        <div style="font-family:system-ui,sans-serif;padding:4px;">
+          <h3 style="margin:0 0 8px;font-size:14px;font-weight:600;">⚠️ Report Issue</h3>
+          <p style="margin:0 0 8px;font-size:12px;color:#666;">${pointName}</p>
+          <select id="report-type" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;margin-bottom:8px;font-size:12px;">
+            <option value="broken">Broken / Not working</option>
+            <option value="incorrect_location">Incorrect location</option>
+            <option value="needs_repair">Needs repair</option>
+            <option value="contaminated">Contaminated</option>
+            <option value="other">Other</option>
+          </select>
+          <textarea id="report-desc" placeholder="Additional details (optional)" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;margin-bottom:8px;font-size:12px;height:60px;resize:vertical;"></textarea>
+          <button id="submit-report-btn" style="
+            width:100%;padding:8px;background:#F44336;color:white;border:none;border-radius:6px;
+            cursor:pointer;font-size:12px;font-weight:600;
+          ">Submit Report</button>
+        </div>
+      `;
+      popupRef.current.setHTML(html);
+      setTimeout(() => {
+        const btn = document.getElementById("submit-report-btn");
+        if (btn) btn.onclick = () => submitReport(pointId);
+      }, 50);
+    }
+  }
+
+  async function submitReport(pointId: string) {
+    const typeEl = document.getElementById("report-type") as HTMLSelectElement;
+    const descEl = document.getElementById("report-desc") as HTMLTextAreaElement;
+    if (!typeEl) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/crowd/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          water_point_id: pointId,
+          report_type: typeEl.value,
+          description: descEl?.value || "",
+          reported_by: "map_user",
+        }),
+      });
+      if (!res.ok) throw new Error("Report failed");
+      if (popupRef.current) {
+        popupRef.current.setHTML(
+          '<div style="font-family:system-ui,sans-serif;padding:8px;text-align:center;">
+            <div style="font-size:24px;margin-bottom:4px;">✅</div>
+            <b>Report submitted!</b>
+            <p style="margin:4px 0 0;font-size:12px;color:#666;">Thank you for your report.</p>
+          </div>'
+        );
+      }
+    } catch (err) {
+      alert("Failed to submit report. Please try again.");
+    }
+  }
+
+  async function submitNewWaterPoint() {
+    if (!submitForm.name) {
+      alert("Please enter a name for the water point.");
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/crowd/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: submitForm.name,
+          water_type: submitForm.water_type,
+          latitude: submitForm.lat,
+          longitude: submitForm.lon,
+          description: submitForm.description,
+          submitted_by: "map_user",
+        }),
+      });
+      if (!res.ok) throw new Error("Submission failed");
+      setSubmitForm({ show: false, lat: 0, lon: 0, name: "", water_type: "tap", description: "" });
+      setSubmitMode(false);
+      alert("Water point submitted for review! Thank you.");
+    } catch (err) {
+      alert("Failed to submit. Please try again.");
+    }
   }
 
   function locateUser() {
@@ -453,6 +563,25 @@ export default function MapView() {
           📍 My Location
         </button>
 
+        <button
+          onClick={() => {
+            setSubmitMode(!submitMode);
+            if (submitMode) setSubmitForm({ show: false, lat: 0, lon: 0, name: "", water_type: "tap", description: "" });
+          }}
+          style={{
+            padding: "4px 10px",
+            borderRadius: 4,
+            border: submitMode ? "1px solid #4CAF50" : "1px solid #FF9800",
+            background: submitMode ? "#4CAF50" : "#FF9800",
+            color: "white",
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 600,
+          }}
+        >
+          {submitMode ? "✓ Click map" : "+ Submit Point"}
+        </button>
+
         {routing && (
           <span style={{ color: "#1976D2", fontSize: 11 }}>Calculating route...</span>
         )}
@@ -530,6 +659,101 @@ export default function MapView() {
           ))}
         </div>
       </div>
+
+      {/* Submit Water Point Form Overlay */}
+      {submitForm.show && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "white",
+            borderRadius: 12,
+            padding: "20px 24px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+            zIndex: 100,
+            width: 320,
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
+          <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700 }}>
+            ➕ Submit Water Point
+          </h3>
+          <p style={{ margin: "0 0 12px", fontSize: 12, color: "#666" }}>
+            Location: {submitForm.lat.toFixed(4)}, {submitForm.lon.toFixed(4)}
+          </p>
+
+          <label style={{ display: "block", marginBottom: 8, fontSize: 12, fontWeight: 500 }}>
+            Name *
+            <input
+              type="text"
+              value={submitForm.name}
+              onChange={(e) => setSubmitForm({ ...submitForm, name: e.target.value })}
+              placeholder="e.g. Surulere Community Well"
+              style={{
+                width: "100%", padding: 8, marginTop: 4, border: "1px solid #ccc",
+                borderRadius: 6, fontSize: 13, boxSizing: "border-box",
+              }}
+            />
+          </label>
+
+          <label style={{ display: "block", marginBottom: 8, fontSize: 12, fontWeight: 500 }}>
+            Water Type
+            <select
+              value={submitForm.water_type}
+              onChange={(e) => setSubmitForm({ ...submitForm, water_type: e.target.value })}
+              style={{
+                width: "100%", padding: 8, marginTop: 4, border: "1px solid #ccc",
+                borderRadius: 6, fontSize: 13, boxSizing: "border-box",
+              }}
+            >
+              <option value="tap">Tap</option>
+              <option value="well">Well</option>
+              <option value="borehole">Borehole</option>
+              <option value="spring">Spring</option>
+              <option value="rainwater">Rainwater</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+
+          <label style={{ display: "block", marginBottom: 12, fontSize: 12, fontWeight: 500 }}>
+            Description (optional)
+            <textarea
+              value={submitForm.description}
+              onChange={(e) => setSubmitForm({ ...submitForm, description: e.target.value })}
+              placeholder="Any additional details..."
+              style={{
+                width: "100%", padding: 8, marginTop: 4, border: "1px solid #ccc",
+                borderRadius: 6, fontSize: 13, height: 60, resize: "vertical",
+                boxSizing: "border-box",
+              }}
+            />
+          </label>
+
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => setSubmitForm({ show: false, lat: 0, lon: 0, name: "", water_type: "tap", description: "" })}
+              style={{
+                flex: 1, padding: 10, background: "#e5e7eb", border: "none",
+                borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 600,
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={submitNewWaterPoint}
+              style={{
+                flex: 1, padding: 10, background: "#4CAF50", color: "white",
+                border: "none", borderRadius: 6, cursor: "pointer",
+                fontSize: 13, fontWeight: 600,
+              }}
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

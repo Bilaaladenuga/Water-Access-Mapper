@@ -1,9 +1,9 @@
 # Water Access Mapper - Progress Tracker
 
 ## Current Status
-- **Current Phase**: Phase 7 — Accessibility Model COMPLETE
-- **Current Task**: Ready for Phase 8
-- **Last Updated**: 2026-08-30
+- **Current Phase**: Phase 8 — Crowdsourcing COMPLETE
+- **Current Task**: Ready for Phase 9
+- **Last Updated**: 2026-09-01
 
 ---
 
@@ -115,9 +115,14 @@
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 8.1 | Submit water points | [ ] Pending |
-| 8.2 | Report broken points | [ ] Pending |
-| 8.3 | Report incorrect locations | [ ] Pending |
+| 8.1 | Submit water points | [x] Completed |
+| 8.2 | Report broken points | [x] Completed |
+| 8.3 | Report incorrect locations | [x] Completed |
+| 8.4 | List submissions/reports | [x] Completed |
+| 8.5 | Approve/reject submissions | [x] Completed |
+| 8.6 | Resolve reports | [x] Completed |
+
+**Note:** Full crowdsourcing workflow implemented. Users can submit new water points via map click form, report issues (broken, incorrect location, contaminated) via popup buttons. Submissions stored in `water_point_submissions` table as pending until approved. Reports stored in `water_point_reports` table. Admin endpoints: approve/reject submissions, resolve reports. Approved submissions automatically inserted into `water_points` as verified crowdsourced data.
 
 ---
 
@@ -173,6 +178,7 @@
 
 1. Network connectivity issues resolved with pnpm for frontend
 2. Windows file-locking issues with npm resolved using pnpm
+3. asyncpg statement caching can cause stale schema issues after DDL changes (fixed with statement_cache_size=0)
 
 ## Decisions Made
 
@@ -180,6 +186,9 @@
 2. **Neon**: Serverless PostgreSQL + PostGIS (migrated from Supabase)
 3. **OSRM**: OpenStreetMap-based routing for walking routes
 4. **Sample Data**: Initial implementation uses clearly labeled sample data
-5. **OSM Integration**: Real water points from Overpass API (68 points)
+5. **OSM Integration**: Real water points from Overpass API (69 points)
 6. **Linting**: ESLint + Prettier for frontend, Ruff for Python backend
 7. **pnpm**: Used to work around Windows npm file-locking issues
+8. **OpenFreeMap**: Free vector tile provider (no API key needed)
+9. **OCHA HDX COD-AB**: Official Lagos State boundary (CC BY-IGO license)
+10. **Crowdsourcing**: Unverified submissions require admin approval before becoming trusted data

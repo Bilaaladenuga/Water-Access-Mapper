@@ -22,12 +22,15 @@ if "channel_binding" in DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("&channel_binding=require", "")
 
 # Create async engine
+# statement_cache_size=0 disables prepared statement caching, which prevents
+# stale schema issues when table columns change type.
 engine = create_async_engine(
     DATABASE_URL,
     echo=settings.debug,
     pool_pre_ping=True,  # Verify connections before use
     pool_size=5,
     max_overflow=10,
+    connect_args={"statement_cache_size": 0},
 )
 
 # Session factory

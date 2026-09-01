@@ -73,10 +73,12 @@ from routes.water_points import router as water_points_router
 from routes.spatial_queries import router as spatial_router
 from routes.routing import router as routing_router
 from routes.accessibility import router as accessibility_router
+from routes.crowdsourcing import router as crowdsourcing_router
 app.include_router(water_points_router)
 app.include_router(spatial_router)
 app.include_router(routing_router)
 app.include_router(accessibility_router)
+app.include_router(crowdsourcing_router)
 
 
 @app.get("/")
@@ -104,5 +106,11 @@ async def root():
             "analysis": "/api/accessibility/analysis",
             "underserved": "/api/accessibility/underserved",
             "point_analysis": "/api/accessibility/point-analysis?lat=6.5&lon=3.4",
+        },
+        "crowdsourcing": {
+            "submit": "POST /api/crowd/submit",
+            "report": "POST /api/crowd/report",
+            "submissions": "/api/crowd/submissions?status=pending",
+            "reports": "/api/crowd/reports?resolved=false",
         },
     }
