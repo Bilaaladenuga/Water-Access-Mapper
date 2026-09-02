@@ -130,6 +130,70 @@ async def get_quality_summary():
     }
 
 
+@router.get("/by-lga")
+async def get_quality_by_lga():
+    """Water quality breakdown by LGA with per-point details."""
+    async with async_session_factory() as session:
+        result = await session.execute(text("""
+            SELECT DISTINCT ON (wq.water_point_id)
+                wq.water_point_id, wq.ph, wq.turbidity, wq.coliform_count,
+                wq.status as quality_status, wq.test_date,
+                wp.name, wp.water_type, wp.lga
+            FROM water_quality wq
+            JOIN water_points wp ON wq.water_point_id = wp.id
+            ORDER BY wq.water_point_id, wq.test_date DESC
+        """))
+        rows = result.fetchall()
+
+    # Group by LGA
+    lga_data = {}
+    for row in rows:
+        lga = row[8] or "Unknown"
+        if lga not in lga_data:
+            lga_data[lga] = {
+                "lga_name": lga,
+                "points_tested": 0,
+                "avg_ph": [],
+                "avg_turbidity": [],
+                "avg_coliform": [],
+                "by_status": {"good": 0, "moderate": 0, "poor": 0},
+                "points": [],
+            }
+        entry = lga_data[lga]
+        entry["points_tested"] += 1
+        if row[1] is not None:
+            entry["avg_ph"].append(float(row[1]))
+        if row[2] is not None:
+            entry["avg_turbidity"].append(float(row[2]))
+        if row[3] is not None:
+            entry["avg_coliform"].append(float(row[3]))
+        status = row[4] or "poor"
+        entry["by_status"][status] = entry["by_status"].get(status, 0) + 1
+        entry["points"].append({
+            "name": row[6],
+            "water_type": row[7],
+            "ph": float(row[1]) if row[1] else None,
+            "turbidity": float(row[2]) if row[2] else None,
+            "coliform_count": row[3],
+            "quality_status": status,
+            "test_date": row[5].isoformat() if row[5] else None,
+        })
+
+    # Calculate averages
+    result_list = []
+    for lga in lga_data.values():
+        ph_vals = lga.pop("avg_ph")
+        turb_vals = lga.pop("avg_turbidity")
+        col_vals = lga.pop("avg_coliform")
+        lga["avg_ph"] = round(sum(ph_vals) / len(ph_vals), 1) if ph_vals else None
+        lga["avg_turbidity"] = round(sum(turb_vals) / len(turb_vals), 1) if turb_vals else None
+        lga["avg_coliform"] = round(sum(col_vals) / len(col_vals), 0) if col_vals else None
+        result_list.append(lga)
+
+    result_list.sort(key=lambda x: x["points_tested"], reverse=True)
+    return {"lgas": result_list, "total_tested": sum(l["points_tested"] for l in result_list)}
+
+
 @router.get("/geojson")
 async def get_quality_geojson():
     """Get all tested water points with their latest quality status as GeoJSON."""

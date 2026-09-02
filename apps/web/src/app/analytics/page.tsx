@@ -253,12 +253,20 @@ export default function AnalyticsPage() {
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>📊 Analytics Dashboard</h1>
           <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>Water Access Mapper — Lagos State</div>
         </div>
-        <Link href="/" style={{
-          padding: "8px 16px", background: "#1976D2", color: "white",
-          borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600,
-        }}>
-          🗺️ Back to Map
-        </Link>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Link href="/water-quality" style={{
+            padding: "8px 16px", background: "#00897B", color: "white",
+            borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600,
+          }}>
+            💧 Water Quality
+          </Link>
+          <Link href="/" style={{
+            padding: "8px 16px", background: "#1976D2", color: "white",
+            borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600,
+          }}>
+            🗺️ Map
+          </Link>
+        </div>
       </div>
 
       <div style={{ padding: isMobile ? "16px 12px" : "24px 32px", maxWidth: 1400, margin: "0 auto" }}>

@@ -781,6 +781,12 @@ export default function MapView() {
           >
             🏛️ LGA Breakdown →
           </a>
+          <a
+            href="/water-quality"
+            style={{ color: "#00897B", fontSize: 11, textDecoration: "none", fontWeight: 500, display: "block", marginTop: 2 }}
+          >
+            💧 Water Quality →
+          </a>
         </div>
       )}
 
@@ -805,8 +811,9 @@ export default function MapView() {
         >
           <span style={{ fontWeight: 600 }}>💧 {stats.total} points</span>
           <div style={{ display: "flex", gap: 10 }}>
-            <a href="/analytics" style={{ color: "#1976D2", textDecoration: "none", fontWeight: 500 }}>📊 Analytics</a>
-            <a href="/lga" style={{ color: "#7B1FA2", textDecoration: "none", fontWeight: 500 }}>🏛️ LGA</a>
+            <a href="/analytics" style={{ color: "#1976D2", textDecoration: "none", fontWeight: 500 }}>📊</a>
+            <a href="/lga" style={{ color: "#7B1FA2", textDecoration: "none", fontWeight: 500 }}>🏛️</a>
+            <a href="/water-quality" style={{ color: "#00897B", textDecoration: "none", fontWeight: 500 }}>💧</a>
           </div>
         </div>
       )}
