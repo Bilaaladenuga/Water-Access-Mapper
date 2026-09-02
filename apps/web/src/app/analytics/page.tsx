@@ -48,6 +48,8 @@ interface Coverage {
   total_points: number;
   density_per_km2: number;
   average_nearest_neighbor_m: number;
+  min_nearest_neighbor_m: number;
+  max_nearest_neighbor_m: number;
   proximity: {
     within_500m: number;
     between_500m_1km: number;
