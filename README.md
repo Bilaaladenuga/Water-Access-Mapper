@@ -17,10 +17,6 @@
 
 ## 📸 Screenshots
 
-> **To add screenshots:** Take screenshots of the pages below and save them to `docs/screenshots/`. Then uncomment the image lines in this section.
-
-<!-- Uncomment and update paths after taking screenshots:
-
 ### 🗺️ Interactive Map
 ![Map View](docs/screenshots/map-view.png)
 *Interactive map showing 159 water points across Lagos State with real OCHA HDX boundary, OpenFreeMap vector tiles, and walking route navigation.*
@@ -44,8 +40,6 @@
 ### 📥 Data Export
 ![Data Export](docs/screenshots/data-export.png)
 *Download water points as GeoJSON for QGIS or CSV for spreadsheet analysis.*
-
--->
 
 ---
 
