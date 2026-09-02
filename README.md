@@ -1,17 +1,57 @@
-# Water Access Mapper
+# 🌊 Water Access Mapper
 
-A geospatial web application for mapping, analyzing, and improving water point accessibility in Lagos State, Nigeria.
+> An interactive geospatial web application for mapping, analyzing, and improving water point accessibility across Lagos State, Nigeria.
 
-![MapLibre GL JS](https://img.shields.io/badge/Map-MapLibre%20GL%20JS-blue)
-![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green)
-![PostGIS](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20PostGIS-blue)
-![Next.js](https://img.shields.io/badge/Frontend-Next.js%2014-black)
+[![Next.js](https://img.shields.io/badge/Frontend-Next.js%2014-black?logo=next.js)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![PostGIS](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20PostGIS-336791?logo=postgresql)](https://postgis.net/)
+[![MapLibre](https://img.shields.io/badge/Map-MapLibre%20GL%20JS-336791?logo=mapbox)](https://maplibre.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://python.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org/)
+
+**🌐 Live:** [water-access-mapper.vercel.app](https://water-access-mapper.vercel.app)
+**📡 API:** [water-access-mapper-api.onrender.com](https://water-access-mapper-api.onrender.com)
+**📖 API Docs:** [water-access-mapper-api.onrender.com/docs](https://water-access-mapper-api.onrender.com/docs)
 
 ---
 
-## Problem Statement
+## 📸 Screenshots
 
-Access to clean water remains a critical challenge in Lagos State, Nigeria — a megacity of over 20 million people. Communities often lack comprehensive, up-to-date information about available water points, their operational status, and accessibility. Existing data is fragmented across multiple sources and rarely integrated into a single, actionable platform.
+> **To add screenshots:** Take screenshots of the pages below and save them to `docs/screenshots/`. Then uncomment the image lines in this section.
+
+<!-- Uncomment and update paths after taking screenshots:
+
+### 🗺️ Interactive Map
+![Map View](docs/screenshots/map-view.png)
+*Interactive map showing 159 water points across Lagos State with real OCHA HDX boundary, OpenFreeMap vector tiles, and walking route navigation.*
+
+### 📊 Analytics Dashboard
+![Analytics Dashboard](docs/screenshots/analytics-dashboard.png)
+*Real-time analytics with water point statistics, status breakdowns, and data quality metrics.*
+
+### 🏛️ LGA-Level Analytics
+![LGA Analytics](docs/screenshots/lga-analytics.png)
+*Water access breakdown across all 20 Local Government Areas with density comparison and sortable data table.*
+
+### 💧 Water Quality Analysis
+![Water Quality](docs/screenshots/water-quality.png)
+*WHO drinking water guideline compliance with pH, turbidity, and coliform charts across tested LGAs.*
+
+### 📱 Mobile Responsive
+![Mobile View](docs/screenshots/mobile-view.png)
+*Fully responsive design with hamburger menu, compact stats bar, and touch-friendly controls.*
+
+### 📥 Data Export
+![Data Export](docs/screenshots/data-export.png)
+*Download water points as GeoJSON for QGIS or CSV for spreadsheet analysis.*
+
+-->
+
+---
+
+## 🎯 Problem Statement
+
+Access to clean water remains a critical challenge in Lagos State, Nigeria — a megacity of over 20 million people. Communities often lack comprehensive, up-to-date information about available water points, their operational status, and accessibility.
 
 **This project addresses that gap** by creating an interactive, data-driven platform that:
 
@@ -22,7 +62,7 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 
 ---
 
-## Study Area
+## 🗺️ Study Area
 
 **Lagos State, Nigeria** — the most populous state in Nigeria and one of the largest metropolitan areas in Africa.
 
@@ -32,62 +72,34 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 | **Boundary source** | OCHA HDX COD-AB (CC BY-IGO) |
 | **Coordinates** | 6.37–6.70°N, 2.70–4.35°E |
 | **LGAs covered** | All 20 Local Government Areas |
-| **Water points** | 147 (69 OSM + 77 sample + 1 crowdsourced) |
-
-The study area boundary was downloaded from the [OCHA Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga) using the official Nigerian Administrative Boundaries (COD-AB) dataset.
-
----
-
-## Methodology
-
-### Data Collection
-
-1. **OpenStreetMap (OSM)** — 69 real water points downloaded via the Overpass API, queried across 5 tag types: `drinking_water`, `water_well`, `water_tap`, `water_point`, `spring`
-2. **Sample Data** — 77 clearly labeled sample points for demonstration, spread across Lagos neighborhoods
-3. **Crowdsourcing** — User-submitted points through the web interface (stored as unverified until approved)
-
-### Spatial Analysis
-
-| Technique | PostGIS Function | Purpose |
-|-----------|-----------------|---------|
-| **Nearest Neighbor** | `ST_Distance` + KNN `<->` operator | Find closest water point to any location |
-| **Radius Search** | `ST_DWithin` (geography) | All water points within X meters |
-| **Density Grid** | `ST_X`/`ST_Y` + `GROUP BY` | Identify high/low density areas |
-| **Accessibility Model** | Haversine formula + grid overlay | Classify areas by water access (0–500m to >5km) |
-| **Walking Routes** | OSRM foot profile | Network-based walking routes |
-
-### Data Quality
-
-- Coordinate validation (range checks within Lagos bounds)
-- Duplicate detection (50m threshold using Shapely)
-- Geometry validation (`ST_IsValid`, `shapely.validation.make_valid()`)
-- Data provenance tracking (source: osm/sample/crowdsourced)
+| **Total water points** | 159 (69 OSM + 89 sample + 1 crowdsourced) |
+| **Water quality tested** | 15 points across 7 LGAs |
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
 ```
-┌──────────────────────────────────────────────┐
-│           Frontend (Next.js 14)               │
-│     MapLibre GL JS · React · TypeScript       │
-│     OpenFreeMap vector tiles (no API key)     │
-└──────────────────┬───────────────────────────┘
-                   │ REST API (JSON)
-                   ▼
-┌──────────────────────────────────────────────┐
-│           Backend (FastAPI)                    │
-│     25+ endpoints · Spatial queries           │
-│     OSRM routing · Crowdsourcing              │
-└──────────────────┬───────────────────────────┘
-                   │ asyncpg + SQLAlchemy
-                   ▼
-┌──────────────────────────────────────────────┐
-│     Database (Neon PostgreSQL + PostGIS)       │
-│     water_points · study_areas                 │
-│     water_point_submissions · reports          │
-│     Spatial indexes (GIST)                     │
-└──────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│          Frontend (Next.js 14 + React)           │
+│    MapLibre GL JS · TypeScript · Tailwind CSS    │
+│    OpenFreeMap vector tiles (no API key)         │
+└──────────────────────┬──────────────────────────┘
+                       │ REST API (JSON)
+                       ▼
+┌─────────────────────────────────────────────────┐
+│              Backend (FastAPI)                    │
+│    30+ endpoints · Spatial queries               │
+│    OSRM routing · Crowdsourcing · Analytics      │
+└──────────────────────┬──────────────────────────┘
+                       │ asyncpg + SQLAlchemy
+                       ▼
+┌─────────────────────────────────────────────────┐
+│      Database (Neon PostgreSQL + PostGIS)         │
+│    water_points · lga_boundaries                  │
+│    water_quality · submissions · reports          │
+│    Spatial indexes (GIST) · KNN operator          │
+└─────────────────────────────────────────────────┘
 ```
 
 ### Key Design Decisions
@@ -100,68 +112,96 @@ The study area boundary was downloaded from the [OCHA Humanitarian Data Exchange
 
 ---
 
-## Technology Stack
+## 🔧 Technology Stack
 
-| Layer | Technology | Reason |
-|-------|-----------|--------|
+| Layer | Technology | Why |
+|-------|-----------|-----|
 | **Frontend** | Next.js 14, React 18, TypeScript | SSR/SSG, type safety, React ecosystem |
 | **Maps** | MapLibre GL JS | Open-source, vector/raster tile support |
 | **Tile Provider** | OpenFreeMap | Free, no API key, no rate limits |
 | **Backend** | Python 3.11, FastAPI | Async support, automatic API docs, Pydantic validation |
 | **Database** | PostgreSQL 15 + PostGIS 3.3 | Spatial indexing, KNN queries, geodesic distance |
-| **Hosting** | Neon (serverless PostgreSQL) | Free tier, auto-scaling, connection pooling |
+| **Hosting** | Vercel (frontend) + Render (backend) + Neon (database) | Free tier deployment |
 | **Routing** | OSRM (Open Source Routing Machine) | OSM road network, walking profile |
 | **Geospatial** | GeoPandas, Shapely, NumPy | Geometry validation, spatial operations |
+| **Search** | Nominatim (OpenStreetMap) | Free geocoding, no API key |
 
 ---
 
-## API Endpoints
+## 📊 Features
+
+### Core Features
+- 🗺️ **Interactive Map** — OpenFreeMap vector tiles with 159 water points
+- 🔍 **Location Search** — Nominatim geocoding (type any Lagos location)
+- 🔥 **Heatmap Toggle** — Density visualization showing concentration
+- 🚶 **Walking Routes** — OSRM network-based routes with distance/time
+- 📍 **Geolocation** — Find your position on the map
+- 🎯 **Filters** — By water type (tap/well/borehole/spring) and status
+
+### Analytics
+- 📊 **Analytics Dashboard** — Summary stats, donut charts, bar charts
+- 🏛️ **LGA Breakdown** — Water access across all 20 LGAs with density comparison
+- 💧 **Water Quality** — WHO guideline compliance with pH/turbidity/coliform charts
+- 📈 **Coverage Analysis** — Proximity analysis and underserved area identification
+
+### Data Management
+- 📥 **Data Export** — Download as GeoJSON (for QGIS) or CSV (for spreadsheets)
+- 📝 **Crowdsourcing** — Submit new water points or report broken ones
+- ✅ **Unverified Workflow** — Submissions require admin approval
+- 🔐 **Data Provenance** — Track source (OSM/sample/crowdsourced) for each point
+
+### Technical
+- 📱 **Mobile Responsive** — Full responsive design with hamburger menu
+- 🧪 **30 Passing Tests** — PostGIS, API, spatial, crowdsourcing, analytics
+- 🚀 **Deployed** — Live on Vercel + Render + Neon
+
+---
+
+## 🌐 API Endpoints (30+)
 
 ### Core
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Service status and version |
 | GET | `/database` | PostgreSQL + PostGIS version |
-| GET | `/` | API info and endpoint listing |
 | GET | `/docs` | Swagger UI interactive documentation |
 
 ### Water Points
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/water-points/geojson` | All water points as GeoJSON |
-| GET | `/api/water-points/geojson?status=operational` | Filter by status |
-| GET | `/api/water-points/geojson?water_type=tap` | Filter by type |
 | GET | `/api/water-points/stats` | Counts by status, type, source |
 | GET | `/api/study-areas/geojson` | Lagos State boundary polygon |
 
 ### Spatial Queries
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/spatial/nearest?lat=&lon=` | Nearest water point (KNN) |
 | GET | `/api/spatial/within-radius?lat=&lon=&radius_meters=` | Points within radius |
-| GET | `/api/spatial/analysis?lat=&lon=&radius_meters=` | Combined analysis |
 | GET | `/api/spatial/density` | Grid-based density |
 
 ### Routing
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/routing/to-nearest?lat=&lon=` | Walking route to nearest |
 | GET | `/api/routing/to-point?lat=&lon=&target_id=` | Route to specific point |
 
-### Accessibility
-
+### LGA Analytics
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/accessibility/analysis` | Coverage by distance categories |
-| GET | `/api/accessibility/underserved` | Identify underserved areas |
-| GET | `/api/accessibility/point-analysis?lat=&lon=` | Point-specific analysis |
+| GET | `/api/lga/analytics` | Water access by LGA |
+| GET | `/api/lga/summary` | Quick LGA summary stats |
+| GET | `/api/lga/boundaries` | LGA boundaries as GeoJSON |
+
+### Water Quality
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/water-quality/summary` | Quality summary stats |
+| GET | `/api/water-quality/by-lga` | Quality breakdown by LGA |
+| GET | `/api/water-quality/geojson` | Tested points as GeoJSON |
+| POST | `/api/water-quality/submit` | Submit new test result |
 
 ### Crowdsourcing
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/crowd/submit` | Submit new water point |
@@ -172,236 +212,95 @@ The study area boundary was downloaded from the [OCHA Humanitarian Data Exchange
 | POST | `/api/crowd/reject/{id}` | Reject submission (admin) |
 | POST | `/api/crowd/resolve/{id}` | Resolve report (admin) |
 
-### Analytics
-
+### Export
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/analytics/summary` | Dashboard summary stats |
-| GET | `/api/analytics/breakdown` | Chart data |
-| GET | `/api/analytics/coverage` | Coverage and density analysis |
-| GET | `/api/analytics/data-quality` | Quality metrics |
+| GET | `/api/export/geojson` | Download all points as GeoJSON |
+| GET | `/api/export/csv` | Download all points as CSV |
 
 ---
 
-## Project Structure
+## 🧪 GIS Analysis
+
+### 1. Nearest Neighbor (KNN)
+Uses PostGIS KNN operator (`<->`) for efficient spatial indexing:
+```sql
+SELECT name, ST_Distance(geometry::geography, point::geography) AS distance
+FROM water_points
+ORDER BY geometry <-> point
+LIMIT 1;
+```
+
+### 2. Radius Search (ST_DWithin)
+Geodesic distance search using geography type:
+```sql
+SELECT * FROM water_points
+WHERE ST_DWithin(geometry::geography, point::geography, :radius_meters);
+```
+
+### 3. Walking Route Calculation
+OSRM foot profile provides network-based walking routes with turn-by-turn instructions.
+
+### 4. Accessibility Classification
+5 distance categories from Excellent (0–500m) to Critical (>5km).
+
+### 5. Density Analysis
+Grid-based density calculation identifying underserved areas.
+
+### 6. LGA Spatial Join
+`ST_Contains` assigns each water point to its Local Government Area boundary.
+
+---
+
+## 📁 Project Structure
 
 ```
 water-access-mapper/
 ├── apps/
-│   ├── web/                        # Next.js frontend
+│   ├── web/                          # Next.js frontend
 │   │   └── src/
 │   │       ├── app/
-│   │       │   ├── page.tsx        # Map page
-│   │       │   └── analytics/      # Analytics dashboard
+│   │       │   ├── page.tsx          # Map page
+│   │       │   ├── analytics/        # Analytics dashboard
+│   │       │   ├── lga/              # LGA-level analytics
+│   │       │   └── water-quality/    # Water quality charts
 │   │       └── components/
-│   │           └── MapView.tsx     # Main map component
-│   └── api/                        # FastAPI backend
-│       ├── main.py                 # App entry point
-│       ├── database.py             # DB connection (asyncpg)
-│       ├── config.py               # Settings
+│   │           └── MapView.tsx       # Main map component
+│   └── api/                          # FastAPI backend
+│       ├── main.py                   # App entry point
+│       ├── database.py               # DB connection (asyncpg)
+│       ├── config.py                 # Settings
 │       └── routes/
-│           ├── water_points.py     # GeoJSON endpoints
-│           ├── spatial_queries.py  # PostGIS analysis
-│           ├── routing.py          # OSRM routing
-│           ├── accessibility.py    # Coverage model
-│           ├── crowdsourcing.py    # Submissions & reports
-│           └── analytics.py        # Dashboard stats
-├── geospatial/
-│   └── ingestion/
-│       ├── geojson_loader.py       # GeoJSON ingestion pipeline
-│       └── osm_loader.py           # Overpass API loader
-├── data/
-│   ├── raw/                        # Downloaded data
-│   ├── processed/boundaries/       # Lagos boundary GeoJSON
-│   └── sample/                     # Sample datasets
+│           ├── water_points.py       # GeoJSON endpoints
+│           ├── spatial_queries.py    # PostGIS analysis
+│           ├── routing.py            # OSRM routing
+│           ├── accessibility.py      # Coverage model
+│           ├── crowdsourcing.py      # Submissions & reports
+│           ├── analytics.py          # Dashboard stats
+│           ├── lga_analytics.py      # LGA breakdown
+│           ├── water_quality.py      # Quality data
+│           └── export.py             # GeoJSON/CSV download
 ├── scripts/
-│   ├── fetch_lagos_boundary.py     # OCHA HDX boundary download
-│   ├── import_geojson.py           # PostGIS import script
-│   └── osm_water_points.py         # Expanded OSM loader
-├── tests/                          # 30 pytest tests
-├── PROJECT_SPEC.md                 # Full project specification
-├── PROGRESS.md                     # Task progress tracker
-└── README.md                       # This file
+│   ├── fetch_lagos_boundary.py       # OCHA HDX boundary download
+│   └── osm_water_points.py           # Expanded OSM loader
+├── tests/                            # 30 pytest tests
+├── PROJECT_SPEC.md                   # Full project specification
+└── PROGRESS.md                       # Task progress tracker
 ```
 
 ---
 
-## Installation
+## 🚀 Deployment
 
-### Prerequisites
-
-- **Node.js 18+** (with pnpm recommended)
-- **Python 3.10+**
-- **Neon account** (free tier for PostgreSQL + PostGIS)
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/Bilaaladenuga/Water-Access-Mapper.git
-cd Water-Access-Mapper
-```
-
-### 2. Backend setup
-
-```bash
-cd apps/api
-
-# Create virtual environment
-python -m venv venv
-
-# Activate (Windows)
-venv\Scripts\activate
-
-# Activate (macOS/Linux)
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your Neon DATABASE_URL
-```
-
-### 3. Load data
-
-```bash
-# Download Lagos State boundary from OCHA HDX
-python scripts/fetch_lagos_boundary.py
-
-# Import boundary into PostGIS
-python scripts/import_geojson.py area data/processed/boundaries/lagos_state.geojson
-
-# Import water points
-python scripts/import_geojson.py water data/sample/water_points.geojson
-
-# Download real OSM water points
-python scripts/osm_water_points.py
-python scripts/import_geojson.py water data/raw/osm_water_points.geojson
-```
-
-### 4. Frontend setup
-
-```bash
-cd apps/web
-
-# Install dependencies
-pnpm install    # or npm install
-
-# Start dev server
-pnpm dev    # or npm run dev
-```
-
-### 5. Start the backend
-
-```bash
-cd apps/api
-uvicorn main:app --reload --port 8000
-```
-
-### 6. Open the application
-
-- **Map**: http://localhost:3000
-- **Analytics**: http://localhost:3000/analytics
-- **API Docs**: http://localhost:8000/docs
-
-### 7. Run tests
-
-```bash
-cd apps/api
-python -m pytest tests/ -v
-```
+| Service | Provider | URL |
+|---------|----------|-----|
+| **Frontend** | Vercel | [water-access-mapper.vercel.app](https://water-access-mapper.vercel.app) |
+| **Backend** | Render | [water-access-mapper-api.onrender.com](https://water-access-mapper-api.onrender.com) |
+| **Database** | Neon | Serverless PostgreSQL + PostGIS |
 
 ---
 
-## Deployment
-
-### Frontend → Vercel
-
-```bash
-cd apps/web
-vercel deploy
-```
-
-Set `NEXT_PUBLIC_API_URL` to your backend URL.
-
-### Backend → Render
-
-1. Create a new Web Service on [render.com](https://render.com)
-2. Connect the GitHub repository
-3. Set build command: `cd apps/api && pip install -r requirements.txt`
-4. Set start command: `cd apps/api && uvicorn main:app --host 0.0.0.0 --port $PORT`
-5. Add environment variable: `DATABASE_URL` (your Neon connection string)
-
-### Database → Neon
-
-1. Create a project at [neon.tech](https://neon.tech)
-2. Copy the connection string to your backend `.env`
-3. Enable PostGIS: `CREATE EXTENSION IF NOT EXISTS postgis;`
-4. Run the data loading scripts (see Installation step 3)
-
----
-
-## GIS Analysis Performed
-
-### 1. Accessibility Classification
-
-Water points are classified into 5 distance categories:
-
-| Category | Distance | Description |
-|----------|----------|-------------|
-| Excellent | 0–500m | Walking distance |
-| Good | 500m–1km | Easy access |
-| Moderate | 1–2km | Requires planning |
-| Poor | 2–5km | Difficult access |
-| Critical | >5km | Severely underserved |
-
-### 2. Nearest Neighbor Analysis
-
-Uses PostGIS KNN operator (`<->`) for efficient spatial indexing:
-
-```sql
-SELECT name, ST_Distance(geometry::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography) AS distance
-FROM water_points
-ORDER BY geometry <-> ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)
-LIMIT 1;
-```
-
-### 3. Walking Route Calculation
-
-OSRM foot profile provides network-based walking routes with:
-- Turn-by-turn navigation instructions
-- Actual walking distance (vs straight-line)
-- Estimated walking time (at 5 km/h average speed)
-
-### 4. Density Analysis
-
-Grid-based density calculation identifies underserved areas:
-
-```sql
-SELECT ROUND(ST_X(geometry), 2) AS grid_x,
-       ROUND(ST_Y(geometry), 2) AS grid_y,
-       COUNT(*) AS point_count
-FROM water_points
-GROUP BY grid_x, grid_y
-ORDER BY point_count DESC;
-```
-
----
-
-## Data Quality
-
-| Metric | Score |
-|--------|-------|
-| **Named points** | 147/147 (100%) |
-| **Valid coordinates** | 147/147 (100%) |
-| **Quality score** | 70.2/100 |
-
-The quality score accounts for naming (30%), coordinate validity (40%), and verification status (30%).
-
----
-
-## Test Results
+## 🧪 Test Results
 
 **30 tests passing** across 5 test files:
 
@@ -417,30 +316,30 @@ Tests run against the live API with real PostGIS queries.
 
 ---
 
-## Limitations
+## ⚠️ Limitations
 
-1. **Sample data** — 77 of 147 points are fabricated for demonstration (clearly labeled)
+1. **Sample data** — 89 of 159 points are fabricated for demonstration (clearly labeled)
 2. **OSM coverage** — OpenStreetMap data varies by region; rural areas may have fewer mapped points
 3. **Routing** — OSRM routing is based on the OSM road network; informal paths may not be included
-4. **Single study area** — Currently limited to Lagos State
-5. **No offline support** — Requires internet connection for map tiles and API calls
+4. **Water quality** — 15 tested points (sample data), not comprehensive testing
+5. **No offline support** — Requires internet for map tiles and API calls
 
 ---
 
-## Future Improvements
+## 🔮 Future Improvements
 
+- **Admin Dashboard** — Review/approve crowdsourced submissions with auth
 - **Multi-country support** — Expand beyond Lagos State
 - **Real-time monitoring** — IoT integration for water point status
 - **Mobile PWA** — Offline-first progressive web app
 - **Satellite imagery** — ML-based water point detection
-- **Water quality data** — Integrate testing results
-- **Community maps** — Neighborhood-level boundary mapping
-- **Analytics export** — PDF/CSV report generation
 - **Multi-language** — Yoruba and Pidgin translations
+- **Time-series tracking** — Historical water point status changes
+- **Embeddable map** — iframe embed code for other sites
 
 ---
 
-## License
+## 📄 License
 
 This project is for educational and portfolio purposes.
 
@@ -449,15 +348,15 @@ This project is for educational and portfolio purposes.
 
 ---
 
-## Author
+## 👤 Author
 
 **Bilaal Adenuga** — Surveying & Geoinformatics Student
 
 Demonstrating proficiency in:
-- GIS and spatial analysis
-- PostGIS spatial databases
-- Python geospatial processing
-- Web GIS with MapLibre GL JS
-- Full-stack development (Next.js + FastAPI)
-- Data quality and validation
-- Open-source geospatial tools
+- 🌍 GIS and spatial analysis
+- 🗄️ PostGIS spatial databases
+- 🐍 Python geospatial processing
+- 🗺️ Web GIS with MapLibre GL JS
+- ⚡ Full-stack development (Next.js + FastAPI)
+- 📊 Data quality and validation
+- 🔧 Open-source geospatial tools
