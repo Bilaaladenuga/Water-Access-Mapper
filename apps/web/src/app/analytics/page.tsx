@@ -5,6 +5,18 @@ import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, [query]);
+  return matches;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   operational: "#4CAF50",
   broken: "#F44336",
@@ -200,6 +212,7 @@ export default function AnalyticsPage() {
   const [coverage, setCoverage] = useState<Coverage | null>(null);
   const [dataQuality, setDataQuality] = useState<DataQuality | null>(null);
   const [loading, setLoading] = useState(true);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     Promise.all([
@@ -231,9 +244,10 @@ export default function AnalyticsPage() {
     <div style={{ fontFamily: "system-ui, sans-serif", background: "#f5f5f5", minHeight: "100vh" }}>
       {/* Header */}
       <div style={{
-        background: "white", padding: "16px 32px",
+        background: "white", padding: "16px 20px",
         boxShadow: "0 1px 4px rgba(0,0,0,0.1)", display: "flex",
         alignItems: "center", justifyContent: "space-between",
+        flexWrap: "wrap", gap: 10,
       }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>📊 Analytics Dashboard</h1>
@@ -247,7 +261,7 @@ export default function AnalyticsPage() {
         </Link>
       </div>
 
-      <div style={{ padding: "24px 32px", maxWidth: 1400, margin: "0 auto" }}>
+      <div style={{ padding: isMobile ? "16px 12px" : "24px 32px", maxWidth: 1400, margin: "0 auto" }}>
         {/* Summary Cards */}
         {summary && (
           <div style={{ display: "flex", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
@@ -276,7 +290,7 @@ export default function AnalyticsPage() {
               boxShadow: "0 2px 8px rgba(0,0,0,0.08)", flex: "1 1 300px",
             }}>
               <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600 }}>🗺️ Coverage Analysis</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 13 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, fontSize: 13 }}>
                 <div>
                   <div style={{ color: "#666", fontSize: 11 }}>Study Area</div>
                   <div style={{ fontWeight: 700, fontSize: 20 }}>{coverage.study_area_km2} km²</div>
@@ -336,7 +350,7 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
                 <div>
                   <div style={{ color: "#666", fontSize: 11 }}>Named Points</div>
                   <div style={{ fontWeight: 700 }}>{dataQuality.named_points} / {dataQuality.total_points}</div>

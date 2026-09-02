@@ -6,6 +6,18 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, [query]);
+  return matches;
+}
+
 const WATER_TYPE_COLORS: Record<string, string> = {
   tap: "#2196F3",
   well: "#4CAF50",
@@ -33,6 +45,8 @@ export default function MapView() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [routing, setRouting] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [submitMode, setSubmitMode] = useState(false);
   const [submitForm, setSubmitForm] = useState<{
     show: boolean;
@@ -653,7 +667,8 @@ export default function MapView() {
         style={{
           position: "absolute",
           top: 10,
-          left: 50,
+          left: isMobile ? 10 : 50,
+          right: isMobile ? 10 : undefined,
           zIndex: 10,
           display: "flex",
           gap: 0,
@@ -661,14 +676,14 @@ export default function MapView() {
       >
         <input
           type="text"
-          placeholder="🔍 Search location in Lagos..."
+          placeholder={isMobile ? "🔍 Search..." : "🔍 Search location in Lagos..."}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();
           }}
           style={{
-            width: 280,
+            width: isMobile ? "100%" : 280,
             padding: "8px 12px",
             borderRadius: "6px 0 0 6px",
             border: "1px solid #ccc",
@@ -734,7 +749,7 @@ export default function MapView() {
       )}
 
       {/* Stats Bar */}
-      {stats && (
+      {stats && !isMobile && (
         <div
           style={{
             position: "absolute",
@@ -769,21 +784,76 @@ export default function MapView() {
         </div>
       )}
 
+      {/* Mobile Compact Stats */}
+      {stats && isMobile && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 10,
+            left: 10,
+            right: 10,
+            background: "white",
+            borderRadius: 8,
+            padding: "8px 12px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            fontSize: 11,
+            zIndex: 10,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span style={{ fontWeight: 600 }}>💧 {stats.total} points</span>
+          <div style={{ display: "flex", gap: 10 }}>
+            <a href="/analytics" style={{ color: "#1976D2", textDecoration: "none", fontWeight: 500 }}>📊 Analytics</a>
+            <a href="/lga" style={{ color: "#7B1FA2", textDecoration: "none", fontWeight: 500 }}>🏛️ LGA</a>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Menu Toggle */}
+      {isMobile && (
+        <button
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 10,
+            zIndex: 11,
+            width: 40,
+            height: 40,
+            borderRadius: 8,
+            border: "none",
+            background: "white",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            fontSize: 20,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {showMobileMenu ? "✕" : "☰"}
+        </button>
+      )}
+
       {/* Controls Panel */}
       <div
         style={{
           position: "absolute",
-          top: 10,
-          right: 60,
+          top: isMobile ? 60 : 10,
+          right: isMobile ? 10 : 60,
+          ...(isMobile ? { left: 10 } : {}),
           background: "white",
           borderRadius: 8,
           padding: "10px 14px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           fontSize: 12,
-          zIndex: 10,
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
+          zIndex: isMobile ? 11 : 10,
+          display: isMobile && !showMobileMenu ? "none" : "flex",
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? 8 : 10,
+          alignItems: isMobile ? "stretch" : "center",
           flexWrap: "wrap",
         }}
       >
@@ -939,15 +1009,16 @@ export default function MapView() {
       <div
         style={{
           position: "absolute",
-          bottom: 30,
+          bottom: isMobile ? 55 : 30,
           left: 10,
           background: "white",
           borderRadius: 8,
-          padding: "12px 16px",
+          padding: isMobile ? "8px 10px" : "12px 16px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          fontSize: 12,
+          fontSize: isMobile ? 10 : 12,
           zIndex: 10,
-          minWidth: 140,
+          minWidth: isMobile ? 100 : 140,
+          maxWidth: isMobile ? 120 : undefined,
         }}
       >
         <div style={{ fontWeight: 600, marginBottom: 4, fontSize: 13 }}>

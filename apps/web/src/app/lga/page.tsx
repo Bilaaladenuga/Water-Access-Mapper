@@ -3,6 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, [query]);
+  return matches;
+}
+
 interface LGAData {
   lga_name: string;
   area_km2: number;
@@ -49,6 +61,7 @@ export default function LGAAnalytics() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<string>("total_points");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -92,21 +105,21 @@ export default function LGAAnalytics() {
   }
 
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 1200, margin: "0 auto", padding: "24px 16px" }}>
+    <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 1200, margin: "0 auto", padding: isMobile ? "12px 8px" : "24px 16px" }}>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>🏛️ LGA-Level Analytics</h1>
+          <h1 style={{ fontSize: isMobile ? 20 : 28, fontWeight: 700, margin: 0 }}>🏛️ LGA-Level Analytics</h1>
           <p style={{ color: "#666", margin: "4px 0 0", fontSize: 14 }}>
             Water access breakdown across {summary?.total_lgas} Local Government Areas in Lagos State
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Link href="/analytics" style={{ padding: "8px 16px", background: "#607D8B", color: "white", borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-            📊 General Analytics
+            📊 Analytics
           </Link>
           <Link href="/" style={{ padding: "8px 16px", background: "#2196F3", color: "white", borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-            🗺️ Back to Map
+            🗺️ Map
           </Link>
         </div>
       </div>
@@ -128,7 +141,7 @@ export default function LGAAnalytics() {
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {sorted.map((lga) => (
             <div key={lga.lga_name} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 130, fontSize: 12, fontWeight: 500, textAlign: "right", flexShrink: 0 }}>
+              <div style={{ width: isMobile ? 80 : 130, fontSize: isMobile ? 10 : 12, fontWeight: 500, textAlign: "right", flexShrink: 0 }}>
                 {lga.lga_name}
               </div>
               <div style={{ flex: 1, height: 22, background: "#f0f0f0", borderRadius: 4, overflow: "hidden", position: "relative" }}>
