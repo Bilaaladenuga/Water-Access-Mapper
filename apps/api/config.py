@@ -29,5 +29,9 @@ settings = Settings()
 
 
 def get_cors_origins() -> list[str]:
-    """Parse CORS origins from comma-separated string."""
-    return [origin.strip() for origin in settings.cors_origins.split(",")]
+    """Parse CORS origins from comma-separated string.
+    Also allows any Vercel preview URL for the project."""
+    origins = [origin.strip() for origin in settings.cors_origins.split(",")]
+    # Allow Vercel preview deployments
+    origins.append("https://water-access-mapper.vercel.app")
+    return origins

@@ -895,7 +895,7 @@ export default function MapView() {
         <div style={{ borderTop: "1px solid #e0e0e0", margin: "6px 0" }} />
 
         <a
-          href="http://localhost:8000/api/export/geojson"
+          href={`${API_URL}/api/export/geojson`}
           download="water_points_lagos.geojson"
           style={{
             display: "block",
@@ -915,7 +915,7 @@ export default function MapView() {
           📥 Export GeoJSON
         </a>
         <a
-          href="http://localhost:8000/api/export/csv"
+          href={`${API_URL}/api/export/csv`}
           download="water_points_lagos.csv"
           style={{
             display: "block",

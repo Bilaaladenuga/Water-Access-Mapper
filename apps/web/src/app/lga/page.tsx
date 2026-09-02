@@ -50,10 +50,12 @@ export default function LGAAnalytics() {
   const [sortBy, setSortBy] = useState<string>("total_points");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
   useEffect(() => {
     Promise.all([
-      fetch("http://localhost:8000/api/lga/analytics").then((r) => r.json()),
-      fetch("http://localhost:8000/api/lga/summary").then((r) => r.json()),
+      fetch(`${API_URL}/api/lga/analytics`).then((r) => r.json()),
+      fetch(`${API_URL}/api/lga/summary`).then((r) => r.json()),
     ]).then(([lgaData, summaryData]) => {
       setLgas(lgaData.lgas);
       setSummary(summaryData);
@@ -273,14 +275,14 @@ export default function LGAAnalytics() {
         <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>📥 Export Data</h2>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <a
-            href="http://localhost:8000/api/export/geojson"
+            href={`${API_URL}/api/export/geojson`}
             download="water_points_lagos.geojson"
             style={{ padding: "10px 20px", background: "#4CAF50", color: "white", borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600 }}
           >
             📥 Download GeoJSON
           </a>
           <a
-            href="http://localhost:8000/api/export/csv"
+            href={`${API_URL}/api/export/csv`}
             download="water_points_lagos.csv"
             style={{ padding: "10px 20px", background: "#FF9800", color: "white", borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600 }}
           >
