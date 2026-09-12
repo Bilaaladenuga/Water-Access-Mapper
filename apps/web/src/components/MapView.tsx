@@ -89,6 +89,16 @@ export default function MapView() {
       loadStudyArea();
       loadLGABoundaries();
       loadWaterPoints();
+
+      // Restore persisted basemap choice
+      let saved: string | null = null;
+      try {
+        saved = localStorage.getItem("basemap");
+      } catch {}
+      if (saved === "satellite") {
+        setShowSatellite(true);
+        applyBasemap(true);
+      }
     });
 
     // Handle map click for submit mode
@@ -495,13 +505,11 @@ export default function MapView() {
     popupRef.current?.remove();
   }
 
-  function toggleSatellite() {
+  function applyBasemap(satellite: boolean) {
     if (!map.current || !map.current.isStyleLoaded()) return;
-    const next = !showSatellite;
-    setShowSatellite(next);
 
     // Raster satellite imagery underneath the data layers
-    if (next && !map.current.getSource("satellite")) {
+    if (satellite && !map.current.getSource("satellite")) {
       map.current.addSource("satellite", {
         type: "raster",
         tiles: [
@@ -536,13 +544,22 @@ export default function MapView() {
       if (dataLayers.includes(layer.id)) continue;
       // Keep place/road labels visible on satellite for context
       const isLabel = (layer as any).type === "symbol";
-      const vis = next ? (isLabel ? "visible" : "none") : "visible";
+      const vis = satellite ? (isLabel ? "visible" : "none") : "visible";
       map.current.setLayoutProperty(layer.id, "visibility", vis);
     }
 
     if (map.current.getLayer("satellite-layer")) {
-      map.current.setLayoutProperty("satellite-layer", "visibility", next ? "visible" : "none");
+      map.current.setLayoutProperty("satellite-layer", "visibility", satellite ? "visible" : "none");
     }
+  }
+
+  function toggleSatellite() {
+    const next = !showSatellite;
+    setShowSatellite(next);
+    try {
+      localStorage.setItem("basemap", next ? "satellite" : "street");
+    } catch {}
+    applyBasemap(next);
   }
 
   function showReportForm(pointId: string, pointName: string) {
