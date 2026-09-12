@@ -1168,6 +1168,21 @@ export default function MapView() {
             </div>
           ))}
         </div>
+
+        {showSatellite && (
+          <div
+            style={{
+              borderTop: "1px solid #e5e7eb",
+              margin: "6px 0 0",
+              paddingTop: 6,
+              fontSize: isMobile ? 8 : 9,
+              color: "#888",
+              lineHeight: 1.4,
+            }}
+          >
+            Satellite imagery © Esri, Maxar, Earthstar Geographics
+          </div>
+        )}
       </div>
 
       {/* Submit Water Point Form Overlay */}
