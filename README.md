@@ -19,7 +19,12 @@
 
 ### 🗺️ Interactive Map
 ![Map View](docs/screenshots/map-view.png)
-*Interactive map showing 159 water points across Lagos State with real OCHA HDX boundary, OpenFreeMap vector tiles, and walking route navigation.*
+*Interactive map showing 159 water points across Lagos State with real OCHA HDX boundary, OpenFreeMap vector tiles, and walking route navigation. Switch to satellite imagery with one click.*
+
+### 🛰️ Satellite Basemap
+<!-- Take a screenshot with the 🛰️ Satellite toggle on, save as docs/screenshots/satellite-view.png, then uncomment: -->
+<!-- ![Satellite View](docs/screenshots/satellite-view.png) -->
+*Esri World Imagery raster basemap with water points and LGA boundaries rendered on top. Choice persists across refreshes.*
 
 ### 📊 Analytics Dashboard
 ![Analytics Dashboard](docs/screenshots/analytics-dashboard.png)
@@ -78,6 +83,7 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 │          Frontend (Next.js 14 + React)           │
 │    MapLibre GL JS · TypeScript · Tailwind CSS    │
 │    OpenFreeMap vector tiles (no API key)         │
+│    Esri World Imagery satellite (no API key)     │
 └──────────────────────┬──────────────────────────┘
                        │ REST API (JSON)
                        ▼
@@ -100,6 +106,7 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 
 - **No Docker** — runs locally with Node.js, Python venv, and Neon PostgreSQL
 - **OpenFreeMap** — free vector tiles with no API key or rate limits
+- **Esri World Imagery** — free satellite raster basemap, no API key, rendered under the data layers
 - **Neon** — serverless PostgreSQL with PostGIS (migrated from Supabase free tier)
 - **OSRM** — OpenStreetMap-based walking route calculations
 - **Unverified data workflow** — crowdsourced submissions require admin approval
@@ -112,7 +119,7 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 |-------|-----------|-----|
 | **Frontend** | Next.js 14, React 18, TypeScript | SSR/SSG, type safety, React ecosystem |
 | **Maps** | MapLibre GL JS | Open-source, vector/raster tile support |
-| **Tile Provider** | OpenFreeMap | Free, no API key, no rate limits |
+| **Tile Provider** | OpenFreeMap + Esri World Imagery | Free street style + free satellite imagery, no API keys |
 | **Backend** | Python 3.11, FastAPI | Async support, automatic API docs, Pydantic validation |
 | **Database** | PostgreSQL 15 + PostGIS 3.3 | Spatial indexing, KNN queries, geodesic distance |
 | **Hosting** | Vercel (frontend) + Render (backend) + Neon (database) | Free tier deployment |
@@ -126,6 +133,7 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 
 ### Core Features
 - 🗺️ **Interactive Map** — OpenFreeMap vector tiles with 159 water points
+- 🛰️ **Satellite Basemap** — Toggle to Esri World Imagery; water points, boundaries, and routes stay on top; choice saved across refreshes
 - 🔍 **Location Search** — Nominatim geocoding (type any Lagos location)
 - 🔥 **Heatmap Toggle** — Density visualization showing concentration
 - 🚶 **Walking Routes** — OSRM network-based routes with distance/time
