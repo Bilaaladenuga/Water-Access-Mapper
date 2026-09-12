@@ -45,6 +45,7 @@ export default function MapView() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [routing, setRouting] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showSatellite, setShowSatellite] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [submitMode, setSubmitMode] = useState(false);
@@ -492,6 +493,56 @@ export default function MapView() {
       map.current.removeSource("route");
     }
     popupRef.current?.remove();
+  }
+
+  function toggleSatellite() {
+    if (!map.current || !map.current.isStyleLoaded()) return;
+    const next = !showSatellite;
+    setShowSatellite(next);
+
+    // Raster satellite imagery underneath the data layers
+    if (next && !map.current.getSource("satellite")) {
+      map.current.addSource("satellite", {
+        type: "raster",
+        tiles: [
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        ],
+        tileSize: 256,
+        maxzoom: 19,
+        attribution: "Imagery © Esri, Maxar, Earthstar Geographics",
+      });
+      // Insert BELOW every data layer so water points, routes, LGA fills stay on top
+      const firstLayer = (map.current.getStyle().layers || [])[0]?.id;
+      map.current.addLayer(
+        { id: "satellite-layer", type: "raster", source: "satellite" },
+        firstLayer
+      );
+    }
+
+    // Street-style basemap layers: anything our GeoJSON/route layers are NOT
+    const dataLayers = [
+      "satellite-layer",
+      "study-area-fill",
+      "study-area-outline",
+      "lga-fill",
+      "lga-labels",
+      "lga-outline",
+      "water-points-circle",
+      "water-points-heatmap",
+      "route-line",
+    ];
+    const layers = map.current.getStyle().layers || [];
+    for (const layer of layers) {
+      if (dataLayers.includes(layer.id)) continue;
+      // Keep place/road labels visible on satellite for context
+      const isLabel = (layer as any).type === "symbol";
+      const vis = next ? (isLabel ? "visible" : "none") : "visible";
+      map.current.setLayoutProperty(layer.id, "visibility", vis);
+    }
+
+    if (map.current.getLayer("satellite-layer")) {
+      map.current.setLayoutProperty("satellite-layer", "visibility", next ? "visible" : "none");
+    }
   }
 
   function showReportForm(pointId: string, pointName: string) {
@@ -944,6 +995,22 @@ export default function MapView() {
           }}
         >
           {showHeatmap ? "🔥 Heatmap ON" : "🗺️ Points"}
+        </button>
+
+        <button
+          onClick={toggleSatellite}
+          style={{
+            padding: "4px 10px",
+            borderRadius: 4,
+            border: showSatellite ? "1px solid #2E7D32" : "1px solid #546E7A",
+            background: showSatellite ? "#2E7D32" : "#546E7A",
+            color: "white",
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 600,
+          }}
+        >
+          {showSatellite ? "🛰️ Satellite ON" : "🛰️ Satellite"}
         </button>
 
         <button
