@@ -22,8 +22,7 @@
 *Interactive map showing 159 water points across Lagos State with real OCHA HDX boundary, OpenFreeMap vector tiles, and walking route navigation. Switch to satellite imagery with one click.*
 
 ### 🛰️ Satellite Basemap
-<!-- Take a screenshot with the 🛰️ Satellite toggle on, save as docs/screenshots/satellite-view.png, then uncomment: -->
-<!-- ![Satellite View](docs/screenshots/satellite-view.png) -->
+![Satellite View](docs/screenshots/satellite-view.png)
 *Esri World Imagery raster basemap with water points and LGA boundaries rendered on top. Choice persists across refreshes.*
 
 ### 📊 Analytics Dashboard
