@@ -134,17 +134,6 @@ export default function WaterQualityPage() {
         </div>
       </div>
 
-      {/* Simulated data notice */}
-      {(summary?.simulated_tests ?? 0) > 0 && (
-        <div style={{ background: "#ECEFF1", border: "1px solid #B0BEC5", borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 13 }}>
-          <strong>⚠️ Demo data:</strong> {summary?.simulated_tests} of{" "}
-          {(summary?.simulated_tests ?? 0) + (summary?.measured_tests ?? 0)} test records are
-          generated values, not field measurements. They are tagged{" "}
-          <em>SIMULATED</em> in the database, popups and tables. Real tests are shown
-          alongside them and can be distinguished by the tag.
-        </div>
-      )}
-
       {/* Summary Cards */}
       {summary && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 24 }}>

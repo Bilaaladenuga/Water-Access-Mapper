@@ -360,24 +360,6 @@ export default function AnalyticsPage() {
           </div>
         )}
 
-        {summary && summary.status_assessed > 0 && (
-          <div style={{
-            background: "#FFF8E1", border: "1px solid #FFE082", borderRadius: 12,
-            padding: "10px 14px", marginBottom: 20, fontSize: 12, color: "#6D4C41",
-          }}>
-            <strong>{summary.status_assessed}</strong> of <strong>{summary.total_water_points}</strong>{" "}
-            points have a status <em>recorded in the source data</em>, and the recorded
-            operational rate (<strong>{summary.operational_rate}%</strong>) is calculated over
-            those only. A further <strong>{summary.status_estimated}</strong> points have a{" "}
-            <em>modelled</em> status — the GRID dataset records no functionality, so a{" "}
-            {summary.estimated_operational_rate}% operational assumption is applied and flagged
-            <code> status_estimated </code>(<strong>{summary.estimated_operational}</strong> assumed
-            operational, <strong>{summary.estimated_broken}</strong> assumed broken). The remaining{" "}
-            {summary.status_unknown} points have no status at all and are counted as <em>unknown</em>,
-            not broken. Modelled values are not field measurements.
-          </div>
-        )}
-
         {/* Charts Row 1 */}
         {breakdown && (
           <div style={{ display: "flex", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
@@ -499,10 +481,6 @@ export default function AnalyticsPage() {
           </div>
         )}
 
-        {/* Footer */}
-        <div style={{ textAlign: "center", fontSize: 11, color: "#999", padding: "16px 0" }}>
-          Water Access Mapper — Phase 9 Analytics · Data sources: GRID baseline + OpenStreetMap + sample + crowdsourced
-        </div>
       </div>
     </div>
   );
