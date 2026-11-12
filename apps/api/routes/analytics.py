@@ -49,10 +49,39 @@ async def get_summary():
         )
         by_source = {row[0]: row[1] for row in result.fetchall()}
 
-        # Operational rate
-        operational = by_status.get("operational", 0)
-        broken = by_status.get("broken", 0)
-        operational_rate = round((operational / total * 100), 1) if total > 0 else 0
+        # Operational rate.
+        # Most GRID/OSM points carry no status field, so dividing by the full
+        # count would report ~5% and imply almost everything is broken. Report
+        # the rate over points whose status is actually known, and expose that
+        # denominator so the UI can label it honestly.
+        #
+        # Two rates are reported separately. GRID statuses are modelled from an
+        # assumption (scripts/estimate_grid_status.py) and flagged
+        # status_estimated = TRUE; mixing them into one rate would present a
+        # guess as a survey result.
+        result = await session.execute(text("""
+            SELECT
+                COUNT(*) FILTER (WHERE status = 'operational' AND NOT status_estimated) AS operational,
+                COUNT(*) FILTER (WHERE status = 'broken' AND NOT status_estimated) AS broken,
+                COUNT(*) FILTER (WHERE status = 'operational' AND status_estimated) AS estimated_operational,
+                COUNT(*) FILTER (WHERE status = 'broken' AND status_estimated) AS estimated_broken,
+                COUNT(*) FILTER (WHERE status_estimated) AS estimated_total
+            FROM water_points
+        """))
+        split = result.fetchone()
+        operational = split[0]
+        broken = split[1]
+        estimated_operational = split[2]
+        estimated_broken = split[3]
+        status_estimated = split[4]
+        assessed = operational + broken
+        estimated_assessed = estimated_operational + estimated_broken
+        unknown = by_status.get("unknown", 0)
+        operational_rate = round((operational / assessed * 100), 1) if assessed > 0 else 0
+        estimated_operational_rate = (
+            round((estimated_operational / estimated_assessed * 100), 1)
+            if estimated_assessed > 0 else 0
+        )
 
         # Pending submissions
         result = await session.execute(
@@ -72,6 +101,15 @@ async def get_summary():
         "by_type": by_type,
         "by_source": by_source,
         "operational_rate": operational_rate,
+        "operational_recorded": operational,
+        "broken_recorded": broken,
+        "status_assessed": assessed,
+        "status_unknown": unknown,
+        "status_estimated": status_estimated,
+        "estimated_assessed": estimated_assessed,
+        "estimated_operational": estimated_operational,
+        "estimated_broken": estimated_broken,
+        "estimated_operational_rate": estimated_operational_rate,
         "pending_submissions": pending_submissions,
         "unresolved_reports": unresolved_reports,
     }
@@ -94,6 +132,22 @@ async def get_breakdown():
             ORDER BY count DESC
         """))
         status_chart = [{"label": row[0], "value": row[1]} for row in result.fetchall()]
+
+        # Same breakdown, split by whether the status was recorded in the
+        # source dataset or modelled (status_estimated = TRUE).
+        result = await session.execute(text("""
+            SELECT status, status_estimated, COUNT(*) as count
+            FROM water_points
+            GROUP BY status, status_estimated
+        """))
+        status_chart_recorded = []
+        status_chart_estimated = []
+        for status, is_estimated, count in result.fetchall():
+            (status_chart_estimated if is_estimated else status_chart_recorded).append(
+                {"label": status, "value": count}
+            )
+        status_chart_recorded.sort(key=lambda d: d["value"], reverse=True)
+        status_chart_estimated.sort(key=lambda d: d["value"], reverse=True)
 
         # Type breakdown for bar chart
         result = await session.execute(text("""
@@ -131,6 +185,8 @@ async def get_breakdown():
 
         return {
             "status_chart": status_chart,
+            "status_chart_recorded": status_chart_recorded,
+            "status_chart_estimated": status_chart_estimated,
             "type_chart": type_chart,
             "source_chart": source_chart,
             "type_status_data": type_status_data,
@@ -169,35 +225,29 @@ async def get_coverage_analysis():
         total = result.scalar()
         density = round(total / area_km2, 4) if area_km2 > 0 else 0
 
-        # Coverage radius analysis
-        # Count points within various radii of each other
+        # Nearest-neighbour distance for every point, in one pass.
+        # Bucketing per point is O(n) and adds up to the point total, which is
+        # meaningful; bucketing point *pairs* is O(n²) and unreadable at this
+        # scale (≈900k pairs dominated by the "beyond 2km" bucket).
         result = await session.execute(text("""
-            WITH point_pairs AS (
-                SELECT a.id as point_a, b.id as point_b,
-                       ST_Distance(a.geometry::geography, b.geometry::geography) as dist
-                FROM water_points a, water_points b
-                WHERE a.id < b.id
+            WITH nn AS (
+                SELECT wp1.id,
+                       (SELECT ST_Distance(wp1.geometry::geography, wp2.geometry::geography)
+                        FROM water_points wp2
+                        WHERE wp2.id <> wp1.id
+                        ORDER BY wp1.geometry <-> wp2.geometry
+                        LIMIT 1) AS dist
+                FROM water_points wp1
             )
             SELECT
-                COUNT(*) FILTER (WHERE dist <= 500) as within_500m,
-                COUNT(*) FILTER (WHERE dist > 500 AND dist <= 1000) as between_500m_1km,
-                COUNT(*) FILTER (WHERE dist > 1000 AND dist <= 2000) as between_1km_2km,
-                COUNT(*) FILTER (WHERE dist > 2000) as beyond_2km
-            FROM point_pairs
-        """))
-        proximity = result.fetchone()
-
-        # Average nearest neighbor distance
-        result = await session.execute(text("""
-            SELECT AVG(min_dist) as avg_nearest, MIN(min_dist) as min_nearest, MAX(min_dist) as max_nearest
-            FROM (
-                SELECT id, MIN(ST_Distance(geometry::geography,
-                    (SELECT geometry FROM water_points wp2 WHERE wp2.id != wp1.id
-                     ORDER BY wp1.geometry <-> wp2.geometry LIMIT 1)::geography
-                )) as min_dist
-                FROM water_points wp1
-                GROUP BY id
-            ) distances
+                AVG(dist) AS avg_nearest,
+                MIN(dist) AS min_nearest,
+                MAX(dist) AS max_nearest,
+                COUNT(*) FILTER (WHERE dist <= 500) AS within_500m,
+                COUNT(*) FILTER (WHERE dist > 500 AND dist <= 1000) AS between_500m_1km,
+                COUNT(*) FILTER (WHERE dist > 1000 AND dist <= 2000) AS between_1km_2km,
+                COUNT(*) FILTER (WHERE dist > 2000) AS beyond_2km
+            FROM nn
         """))
         nn = result.fetchone()
 
@@ -208,11 +258,11 @@ async def get_coverage_analysis():
             "average_nearest_neighbor_m": round(float(nn[0]), 1) if nn and nn[0] else 0,
             "min_nearest_neighbor_m": round(float(nn[1]), 1) if nn and nn[1] else 0,
             "max_nearest_neighbor_m": round(float(nn[2]), 1) if nn and nn[2] else 0,
-            "proximity": {
-                "within_500m": proximity[0] if proximity else 0,
-                "between_500m_1km": proximity[1] if proximity else 0,
-                "between_1km_2km": proximity[2] if proximity else 0,
-                "beyond_2km": proximity[3] if proximity else 0,
+            "nearest_neighbor_distribution": {
+                "within_500m": nn[3] if nn else 0,
+                "between_500m_1km": nn[4] if nn else 0,
+                "between_1km_2km": nn[5] if nn else 0,
+                "beyond_2km": nn[6] if nn else 0,
             },
         }
 

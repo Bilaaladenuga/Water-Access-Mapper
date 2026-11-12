@@ -19,7 +19,7 @@
 
 ### 🗺️ Interactive Map
 ![Map View](docs/screenshots/map-view.png)
-*Interactive map showing 159 water points across Lagos State with real OCHA HDX boundary, OpenFreeMap vector tiles, and walking route navigation. Switch to satellite imagery with one click.*
+*Interactive map showing 1,339 water points across Lagos State with real OCHA HDX boundary, OpenFreeMap vector tiles, and walking route navigation. Switch to satellite imagery with one click.*
 
 ### 🛰️ Satellite Basemap
 ![Satellite View](docs/screenshots/satellite-view.png)
@@ -35,7 +35,7 @@
 
 ### 💧 Water Quality Analysis
 ![Water Quality](docs/screenshots/water-quality.png)
-*WHO drinking water guideline compliance with pH, turbidity, and coliform charts across tested LGAs.*
+*WHO drinking water guideline compliance with pH, turbidity, and coliform charts across tested LGAs. The additional GRID quality records are simulated demo values, clearly tagged as such in the UI.*
 
 ### 📱 Mobile Responsive
 ![Mobile View](docs/screenshots/mobile-view.png)
@@ -70,8 +70,18 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 | **Boundary source** | OCHA HDX COD-AB (CC BY-IGO) |
 | **Coordinates** | 6.37–6.70°N, 2.70–4.35°E |
 | **LGAs covered** | All 20 Local Government Areas |
-| **Total water points** | 159 (69 OSM + 89 sample + 1 crowdsourced) |
-| **Water quality tested** | 15 points across 7 LGAs |
+| **Total water points** | 1,339 (1,180 GRID + 69 OSM + 89 sample + 1 crowdsourced) |
+| **Water quality tested** | 1,195 points (1,180 simulated + 15 measured) |
+
+> **Simulated data notice.** The GRID baseline CSV carries no water quality
+> attributes and no operational status. To make the quality views
+> demonstrable, 1,180 synthetic test results were generated for those points.
+> Every generated record is stored with `is_simulated = TRUE`, attributed to
+> `simulated-demo`, and carries the note *"SIMULATED — synthetic demo data, not
+> a field measurement"*. They are tagged **SIMULATED** in map popups and
+> **SIM** in the quality tables, and can be removed with
+> `python scripts/seed_demo_quality.py --clear`. The 15 real test results are
+> never modified. None of the simulated values are field measurements.
 
 ---
 
@@ -131,13 +141,13 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 ## 📊 Features
 
 ### Core Features
-- 🗺️ **Interactive Map** — OpenFreeMap vector tiles with 159 water points
+- 🗺️ **Interactive Map** — OpenFreeMap vector tiles with 1,339 water points
 - 🛰️ **Satellite Basemap** — Toggle to Esri World Imagery; water points, boundaries, and routes stay on top; choice saved across refreshes
 - 🔍 **Location Search** — Nominatim geocoding (type any Lagos location)
 - 🔥 **Heatmap Toggle** — Density visualization showing concentration
 - 🚶 **Walking Routes** — OSRM network-based routes with distance/time
 - 📍 **Geolocation** — Find your position on the map
-- 🎯 **Filters** — By water type (tap/well/borehole/spring) and status
+- 🎯 **Filters** — By water type (tap/well/borehole/waterworks/spring) and status
 
 ### Analytics
 - 📊 **Analytics Dashboard** — Summary stats, donut charts, bar charts
@@ -149,7 +159,7 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 - 📥 **Data Export** — Download as GeoJSON (for QGIS) or CSV (for spreadsheets)
 - 📝 **Crowdsourcing** — Submit new water points or report broken ones
 - ✅ **Unverified Workflow** — Submissions require admin approval
-- 🔐 **Data Provenance** — Track source (OSM/sample/crowdsourced) for each point
+- 🔐 **Data Provenance** — Track source (GRID/OSM/sample/crowdsourced) for each point
 
 ### Technical
 - 📱 **Mobile Responsive** — Full responsive design with hamburger menu
@@ -200,6 +210,7 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 | GET | `/api/water-quality/summary` | Quality summary stats |
 | GET | `/api/water-quality/by-lga` | Quality breakdown by LGA |
 | GET | `/api/water-quality/geojson` | Tested points as GeoJSON |
+| GET | `/api/water-quality/point/{id}` | Test results for one point |
 | POST | `/api/water-quality/submit` | Submit new test result |
 
 ### Crowdsourcing
@@ -283,7 +294,9 @@ water-access-mapper/
 │           └── export.py             # GeoJSON/CSV download
 ├── scripts/
 │   ├── fetch_lagos_boundary.py       # OCHA HDX boundary download
-│   └── osm_water_points.py           # Expanded OSM loader
+│   ├── osm_water_points.py           # Expanded OSM loader
+│   ├── import_grid_csv.py            # GRID baseline CSV → GeoJSON/PostGIS
+│   └── seed_demo_quality.py          # Simulated demo quality (--clear to remove)
 ├── tests/                            # 30 pytest tests
 ├── PROJECT_SPEC.md                   # Full project specification
 └── PROGRESS.md                       # Task progress tracker
@@ -319,11 +332,13 @@ Tests run against the live API with real PostGIS queries.
 
 ## ⚠️ Limitations
 
-1. **Sample data** — 89 of 159 points are fabricated for demonstration (clearly labeled)
-2. **OSM coverage** — OpenStreetMap data varies by region; rural areas may have fewer mapped points
-3. **Routing** — OSRM routing is based on the OSM road network; informal paths may not be included
-4. **Water quality** — 15 tested points (sample data), not comprehensive testing
-5. **No offline support** — Requires internet for map tiles and API calls
+1. **Sample data** — 89 of 1,339 points are fabricated for demonstration (clearly labeled)
+2. **Simulated water quality** — 1,180 of the 1,195 quality records are generated demo values (`is_simulated = TRUE`), not field measurements. Only 15 records are real. Remove the synthetic set with `scripts/seed_demo_quality.py --clear`.
+3. **Status coverage** — only 79 of 1,339 points have a *recorded* operational status (from the sample dataset). GRID records no functionality, so 1,180 GRID points carry a **modelled** status from a documented 72% operational assumption (`scripts/estimate_grid_status.py`, flagged `status_estimated = TRUE`). Every dashboard, table and map popup separates recorded from modelled status, and the recorded operational rate is calculated over the 79 assessed points only. OSM (69) and 1 crowdsourced point remain `unknown`. Revert the modelled statuses with `python scripts/estimate_grid_status.py --clear`.
+4. **OSM coverage** — OpenStreetMap data varies by region; rural areas may have fewer mapped points
+5. **Routing** — OSRM routing is based on the OSM road network; informal paths may not be included
+6. **Water quality coverage** — 15 real tested points, not comprehensive testing
+7. **No offline support** — Requires internet for map tiles and API calls
 
 ---
 

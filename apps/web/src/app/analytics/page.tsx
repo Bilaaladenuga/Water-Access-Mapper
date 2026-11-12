@@ -28,12 +28,14 @@ const TYPE_COLORS: Record<string, string> = {
   tap: "#2196F3",
   well: "#4CAF50",
   borehole: "#FF9800",
+  waterworks: "#795548",
   spring: "#9C27B0",
   rainwater: "#00BCD4",
   other: "#607D8B",
 };
 
 const SOURCE_COLORS: Record<string, string> = {
+  grid: "#7E57C2",
   osm: "#1976D2",
   sample: "#FF9800",
   crowdsourced: "#4CAF50",
@@ -45,12 +47,23 @@ interface Summary {
   by_type: Record<string, number>;
   by_source: Record<string, number>;
   operational_rate: number;
+  operational_recorded: number;
+  broken_recorded: number;
+  status_assessed: number;
+  status_unknown: number;
+  status_estimated: number;
+  estimated_assessed: number;
+  estimated_operational: number;
+  estimated_broken: number;
+  estimated_operational_rate: number;
   pending_submissions: number;
   unresolved_reports: number;
 }
 
 interface Breakdown {
   status_chart: { label: string; value: number }[];
+  status_chart_recorded: { label: string; value: number }[];
+  status_chart_estimated: { label: string; value: number }[];
   type_chart: { label: string; value: number }[];
   source_chart: { label: string; value: number }[];
 }
@@ -62,7 +75,7 @@ interface Coverage {
   average_nearest_neighbor_m: number;
   min_nearest_neighbor_m: number;
   max_nearest_neighbor_m: number;
-  proximity: {
+  nearest_neighbor_distribution: {
     within_500m: number;
     between_500m_1km: number;
     between_1km_2km: number;
@@ -189,12 +202,16 @@ function DonutChart({ data, colors, title }: {
   );
 }
 
-function ProximityBar({ label, value, maxVal }: { label: string; value: number; maxVal: number }) {
+function ProximityBar({ label, value, maxVal, total }: {
+  label: string; value: number; maxVal: number; total: number;
+}) {
   return (
-    <div style={{ marginBottom: 8 }}>
+    <div style={{ marginBottom: 10 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 2 }}>
         <span>{label}</span>
-        <span style={{ fontWeight: 600 }}>{value} pairs</span>
+        <span style={{ fontWeight: 600 }}>
+          {value} {total > 0 && <span style={{ color: "#999", fontWeight: 400 }}>({((value / total) * 100).toFixed(0)}%)</span>}
+        </span>
       </div>
       <div style={{ background: "#f0f0f0", borderRadius: 4, height: 14, overflow: "hidden" }}>
         <div style={{
@@ -240,6 +257,13 @@ export default function AnalyticsPage() {
     );
   }
 
+  const sourceSubtitle = summary
+    ? Object.entries(summary.by_source)
+        .sort((a, b) => b[1] - a[1])
+        .map(([label, count]) => `${count} ${label}`)
+        .join(" · ")
+    : "";
+
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: "#f5f5f5", minHeight: "100vh" }}>
       {/* Header */}
@@ -260,6 +284,12 @@ export default function AnalyticsPage() {
           }}>
             💧 Water Quality
           </Link>
+          <Link href="/lga" style={{
+            padding: "8px 16px", background: "#607D8B", color: "white",
+            borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600,
+          }}>
+            🏛️ LGA Analytics
+          </Link>
           <Link href="/" style={{
             padding: "8px 16px", background: "#1976D2", color: "white",
             borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600,
@@ -274,10 +304,77 @@ export default function AnalyticsPage() {
         {summary && (
           <div style={{ display: "flex", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
             <StatCard title="Total Water Points" value={summary.total_water_points} color="#1976D2" />
-            <StatCard title="Operational" value={summary.by_status.operational || 0} subtitle={`${summary.operational_rate}% operational rate`} color="#4CAF50" />
-            <StatCard title="Broken" value={summary.by_status.broken || 0} color="#F44336" />
-            <StatCard title="Data Sources" value={Object.keys(summary.by_source).length} subtitle={`${summary.by_source.osm || 0} OSM + ${summary.by_source.grid || 0} GRID + ${summary.by_source.sample || 0} sample`} color="#FF9800" />
+            <StatCard
+              title="Operational"
+              value={summary.by_status.operational || 0}
+              subtitle={
+                summary.status_assessed > 0
+                  ? `${summary.operational_recorded} recorded + ${summary.estimated_operational} modelled`
+                  : "no status recorded"
+              }
+              color="#4CAF50"
+            />
+            <StatCard
+              title="Broken"
+              value={summary.by_status.broken || 0}
+              subtitle={
+                summary.status_assessed > 0
+                  ? `${summary.broken_recorded} recorded + ${summary.estimated_broken} modelled`
+                  : "reported non-functional"
+              }
+              color="#F44336"
+            />
+            <StatCard
+              title="Modelled Status"
+              value={summary.status_estimated}
+              subtitle={
+                summary.estimated_assessed > 0
+                  ? `~${summary.estimated_operational_rate}% assumed operational (GRID)`
+                  : "none"
+              }
+              color="#FFA000"
+            />
+            <StatCard
+              title="Recorded Rate"
+              value={summary.status_assessed > 0 ? `${summary.operational_rate}%` : "—"}
+              subtitle={
+                summary.status_assessed > 0
+                  ? `operational, of ${summary.status_assessed} with a recorded status`
+                  : "no recorded status"
+              }
+              color="#00897B"
+            />
+            <StatCard
+              title="Status Unknown"
+              value={summary.status_unknown}
+              subtitle="source dataset has no status field"
+              color="#9E9E9E"
+            />
+            <StatCard
+              title="Data Sources"
+              value={Object.keys(summary.by_source).length}
+              subtitle={sourceSubtitle}
+              color="#FF9800"
+            />
             <StatCard title="Pending Reviews" value={summary.pending_submissions} subtitle={`${summary.unresolved_reports} unresolved reports`} color="#9C27B0" />
+          </div>
+        )}
+
+        {summary && summary.status_assessed > 0 && (
+          <div style={{
+            background: "#FFF8E1", border: "1px solid #FFE082", borderRadius: 12,
+            padding: "10px 14px", marginBottom: 20, fontSize: 12, color: "#6D4C41",
+          }}>
+            <strong>{summary.status_assessed}</strong> of <strong>{summary.total_water_points}</strong>{" "}
+            points have a status <em>recorded in the source data</em>, and the recorded
+            operational rate (<strong>{summary.operational_rate}%</strong>) is calculated over
+            those only. A further <strong>{summary.status_estimated}</strong> points have a{" "}
+            <em>modelled</em> status — the GRID dataset records no functionality, so a{" "}
+            {summary.estimated_operational_rate}% operational assumption is applied and flagged
+            <code> status_estimated </code>(<strong>{summary.estimated_operational}</strong> assumed
+            operational, <strong>{summary.estimated_broken}</strong> assumed broken). The remaining{" "}
+            {summary.status_unknown} points have no status at all and are counted as <em>unknown</em>,
+            not broken. Modelled values are not field measurements.
           </div>
         )}
 
@@ -287,6 +384,20 @@ export default function AnalyticsPage() {
             <DonutChart data={breakdown.status_chart} colors={STATUS_COLORS} title="By Status" />
             <DonutChart data={breakdown.source_chart} colors={SOURCE_COLORS} title="By Source" />
             <BarChart data={breakdown.type_chart} colors={TYPE_COLORS} title="By Water Type" />
+            <BarChart
+              data={[
+                {
+                  label: "recorded",
+                  value: breakdown.status_chart_recorded.reduce((sum, d) => sum + d.value, 0),
+                },
+                {
+                  label: "modelled",
+                  value: breakdown.status_chart_estimated.reduce((sum, d) => sum + d.value, 0),
+                },
+              ]}
+              colors={{ recorded: "#00897B", modelled: "#FFA000" }}
+              title="Status Provenance"
+            />
           </div>
         )}
 
@@ -322,14 +433,17 @@ export default function AnalyticsPage() {
               background: "white", borderRadius: 12, padding: "20px 24px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.08)", flex: "1 1 300px",
             }}>
-              <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600 }}>📍 Point Proximity</h3>
+              <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600 }}>📍 Nearest Neighbour Distance</h3>
               <div style={{ fontSize: 12, color: "#666", marginBottom: 12 }}>
-                How many point pairs fall within each distance range
+                How far each point is from the closest other point (n = {coverage.total_points})
               </div>
-              <ProximityBar label="Within 500m" value={coverage.proximity.within_500m} maxVal={Math.max(coverage.proximity.within_500m, 1)} />
-              <ProximityBar label="500m — 1km" value={coverage.proximity.between_500m_1km} maxVal={Math.max(coverage.proximity.within_500m, coverage.proximity.between_500m_1km, 1)} />
-              <ProximityBar label="1km — 2km" value={coverage.proximity.between_1km_2km} maxVal={Math.max(coverage.proximity.within_500m, coverage.proximity.between_1km_2km, 1)} />
-              <ProximityBar label="Beyond 2km" value={coverage.proximity.beyond_2km} maxVal={Math.max(coverage.proximity.within_500m, coverage.proximity.beyond_2km, 1)} />
+              <ProximityBar label="Within 500m" value={coverage.nearest_neighbor_distribution.within_500m} maxVal={Math.max(...Object.values(coverage.nearest_neighbor_distribution), 1)} total={coverage.total_points} />
+              <ProximityBar label="500m — 1km" value={coverage.nearest_neighbor_distribution.between_500m_1km} maxVal={Math.max(...Object.values(coverage.nearest_neighbor_distribution), 1)} total={coverage.total_points} />
+              <ProximityBar label="1km — 2km" value={coverage.nearest_neighbor_distribution.between_1km_2km} maxVal={Math.max(...Object.values(coverage.nearest_neighbor_distribution), 1)} total={coverage.total_points} />
+              <ProximityBar label="Beyond 2km" value={coverage.nearest_neighbor_distribution.beyond_2km} maxVal={Math.max(...Object.values(coverage.nearest_neighbor_distribution), 1)} total={coverage.total_points} />
+              <div style={{ fontSize: 11, color: "#999", marginTop: 10 }}>
+                Furthest nearest-neighbour gap: {coverage.max_nearest_neighbor_m} m
+              </div>
             </div>
           </div>
         )}
@@ -377,12 +491,17 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             </div>
+            <div style={{ fontSize: 11, color: "#999", marginTop: 12 }}>
+              Named = has a specific place name rather than a generic label. Verified = confirmed
+              through the crowdsourcing workflow; points imported from GRID and OSM are unverified
+              by design, which is why the verified count is low.
+            </div>
           </div>
         )}
 
         {/* Footer */}
         <div style={{ textAlign: "center", fontSize: 11, color: "#999", padding: "16px 0" }}>
-          Water Access Mapper — Phase 9 Analytics · Data sources: OpenStreetMap + Sample
+          Water Access Mapper — Phase 9 Analytics · Data sources: GRID baseline + OpenStreetMap + sample + crowdsourced
         </div>
       </div>
     </div>

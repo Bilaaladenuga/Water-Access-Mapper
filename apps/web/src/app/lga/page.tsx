@@ -22,12 +22,18 @@ interface LGAData {
   operational: number;
   broken: number;
   unknown_status: number;
+  operational_estimated: number;
+  broken_estimated: number;
+  status_estimated: number;
+  status_assessed: number;
   density_per_km2: number;
   operational_rate_pct: number;
+  estimated_operational_rate_pct: number;
   taps: number;
   wells: number;
   boreholes: number;
   springs: number;
+  waterworks: number;
   osm_points: number;
   sample_points: number;
   crowdsourced_points: number;
@@ -47,6 +53,7 @@ const TYPE_COLORS: Record<string, string> = {
   taps: "#2196F3",
   wells: "#4CAF50",
   boreholes: "#FF9800",
+  waterworks: "#795548",
   springs: "#9C27B0",
 };
 
@@ -54,11 +61,19 @@ const STATUS_COLORS: Record<string, string> = {
   operational: "#4CAF50",
   broken: "#F44336",
   unknown: "#9E9E9E",
+  // Modelled (status_estimated) shares use lighter tints of the same hue.
+  operational_estimated: "#A5D6A7",
+  broken_estimated: "#EF9A9A",
 };
+
+const MODELLED_NOTE =
+  "Modelled status: the GRID source dataset records no functionality, so a 72% operational assumption is applied and flagged status_estimated.";
 
 export default function LGAAnalytics() {
   const [lgas, setLgas] = useState<LGAData[]>([]);
   const [summary, setSummary] = useState<LGASummary | null>(null);
+  const [unassigned, setUnassigned] = useState(0);
+  const [grandTotal, setGrandTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<string>("total_points");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -72,6 +87,8 @@ export default function LGAAnalytics() {
       fetch(`${API_URL}/api/lga/summary`).then((r) => r.json()),
     ]).then(([lgaData, summaryData]) => {
       setLgas(lgaData.lgas);
+      setUnassigned(lgaData.unassigned_points ?? 0);
+      setGrandTotal(lgaData.grand_total ?? 0);
       setSummary(summaryData);
       setLoading(false);
     });
@@ -93,6 +110,33 @@ export default function LGAAnalytics() {
   };
 
   const maxPoints = Math.max(...lgas.map((l) => l.total_points), 1);
+
+  const sourceTotals = lgas.reduce(
+    (acc, l) => ({
+      grid: acc.grid + l.grid_points,
+      osm: acc.osm + l.osm_points,
+      sample: acc.sample + l.sample_points,
+      crowdsourced: acc.crowdsourced + l.crowdsourced_points,
+    }),
+    { grid: 0, osm: 0, sample: 0, crowdsourced: 0 }
+  );
+
+  const totals = lgas.reduce(
+    (acc, l) => ({
+      total: acc.total + l.total_points,
+      operational: acc.operational + l.operational,
+      broken: acc.broken + l.broken,
+      unknown: acc.unknown + l.unknown_status,
+      estimated: acc.estimated + l.status_estimated,
+      estimatedOperational: acc.estimatedOperational + l.operational_estimated,
+      estimatedBroken: acc.estimatedBroken + l.broken_estimated,
+      assessed: acc.assessed + l.status_assessed,
+    }),
+    {
+      total: 0, operational: 0, broken: 0, unknown: 0, estimated: 0,
+      estimatedOperational: 0, estimatedBroken: 0, assessed: 0,
+    }
+  );
 
   if (loading) {
     return (
@@ -138,7 +182,12 @@ export default function LGAAnalytics() {
 
       {/* Bar Chart: Points by LGA */}
       <div style={{ background: "white", borderRadius: 12, padding: 20, marginBottom: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>📊 Water Points by LGA</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>📊 Water Points by LGA</h2>
+        <p style={{ fontSize: 12, color: "#666", margin: "0 0 16px" }}>
+          Bar segments show status. Light green/red are <strong>modelled</strong> statuses for GRID
+          points (no functionality in the source data, 72% operational assumption applied). Grey is
+          unknown — OSM records carry no status at all.
+        </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {sorted.map((lga) => (
             <div key={lga.lga_name} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -165,10 +214,28 @@ export default function LGAAnalytics() {
                   width: `${(lga.broken / maxPoints) * 100}%`,
                   background: STATUS_COLORS.broken,
                 }} />
-                {/* Unknown portion */}
+                {/* Modelled operational portion */}
                 <div style={{
                   position: "absolute",
                   left: `${((lga.operational + lga.broken) / maxPoints) * 100}%`,
+                  top: 0,
+                  height: "100%",
+                  width: `${(lga.operational_estimated / maxPoints) * 100}%`,
+                  background: STATUS_COLORS.operational_estimated,
+                }} />
+                {/* Modelled broken portion */}
+                <div style={{
+                  position: "absolute",
+                  left: `${((lga.operational + lga.broken + lga.operational_estimated) / maxPoints) * 100}%`,
+                  top: 0,
+                  height: "100%",
+                  width: `${(lga.broken_estimated / maxPoints) * 100}%`,
+                  background: STATUS_COLORS.broken_estimated,
+                }} />
+                {/* Unknown portion */}
+                <div style={{
+                  position: "absolute",
+                  left: `${((lga.operational + lga.broken + lga.operational_estimated + lga.broken_estimated) / maxPoints) * 100}%`,
                   top: 0,
                   height: "100%",
                   width: `${(lga.unknown_status / maxPoints) * 100}%`,
@@ -185,9 +252,11 @@ export default function LGAAnalytics() {
         {/* Legend */}
         <div style={{ display: "flex", gap: 16, marginTop: 12, justifyContent: "center" }}>
           {Object.entries(STATUS_COLORS).map(([key, color]) => (
-            <div key={key} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
+            <div key={key} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11 }} title={key.endsWith("_estimated") ? MODELLED_NOTE : undefined}>
               <div style={{ width: 12, height: 12, borderRadius: 2, background: color }} />
-              <span style={{ textTransform: "capitalize" }}>{key}</span>
+              <span style={{ textTransform: "capitalize" }}>
+                {key.replace("operational_estimated", "operational (modelled)").replace("broken_estimated", "broken (modelled)")}
+              </span>
             </div>
           ))}
         </div>
@@ -195,7 +264,25 @@ export default function LGAAnalytics() {
 
       {/* Data Table */}
       <div style={{ background: "white", borderRadius: 12, padding: 20, marginBottom: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.1)", overflowX: "auto" }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>📋 Detailed LGA Data</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>📋 Detailed LGA Data</h2>
+        <p style={{ fontSize: 12, color: "#666", margin: "0 0 6px" }}>
+          <strong>{totals.total}</strong> points fall inside LGA boundaries
+          {unassigned > 0 && (
+            <> ({unassigned} more lie outside every boundary polygon, for a map total of {grandTotal})</>
+          )}
+          . Only <strong>{totals.assessed}</strong> of them have a status recorded in the source
+          data: sample ({sourceTotals.sample}) and crowdsourced ({sourceTotals.crowdsourced}) records
+          do, while GRID ({sourceTotals.grid}) and OSM ({sourceTotals.osm}) carry no status field.{" "}
+          <strong>{totals.estimated}</strong> GRID points instead carry a <strong>modelled</strong>{" "}
+          status ({totals.estimatedOperational} assumed operational, {totals.estimatedBroken} assumed
+          broken) at a 72% operational assumption. <strong>Unknown is not the same as broken, and
+          modelled is not the same as surveyed.</strong>
+        </p>
+        <p style={{ fontSize: 12, color: "#666", margin: "0 0 16px" }}>
+          Total = Operational + Broken + Modelled + Unknown. Op. Rate = recorded operational ÷
+          recorded assessed; an LGA with no recorded status shows “—”. Est. Rate = the modelled rate
+          over the GRID points in that LGA.
+        </p>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: "2px solid #e0e0e0" }}>
@@ -206,11 +293,16 @@ export default function LGAAnalytics() {
                 ["total_points", "Total"],
                 ["operational", "Operational"],
                 ["broken", "Broken"],
+                ["unknown_status", "Unknown"],
+                ["status_estimated", "Modelled"],
+                ["status_assessed", "Assessed"],
                 ["density_per_km2", "Density/km²"],
                 ["operational_rate_pct", "Op. Rate"],
+                ["estimated_operational_rate_pct", "Est. Rate"],
                 ["taps", "Taps"],
                 ["wells", "Wells"],
                 ["boreholes", "Boreholes"],
+                ["waterworks", "Waterworks"],
               ].map(([key, label]) => (
                 <th
                   key={key}
@@ -231,26 +323,99 @@ export default function LGAAnalytics() {
                 <td style={{ ...tdStyle, fontWeight: 600 }}>{lga.total_points}</td>
                 <td style={{ ...tdStyle, color: STATUS_COLORS.operational }}>{lga.operational}</td>
                 <td style={{ ...tdStyle, color: STATUS_COLORS.broken }}>{lga.broken}</td>
+                <td style={{ ...tdStyle, color: STATUS_COLORS.unknown }}>{lga.unknown_status}</td>
+                <td style={tdStyle} title={MODELLED_NOTE}>
+                  {lga.status_estimated > 0 ? (
+                    <span>
+                      <span style={{ color: "#2E7D32" }}>{lga.operational_estimated}</span>
+                      {" / "}
+                      <span style={{ color: "#C62828" }}>{lga.broken_estimated}</span>
+                    </span>
+                  ) : (
+                    <span style={{ color: "#bbb" }}>—</span>
+                  )}
+                </td>
+                <td style={{ ...tdStyle, fontWeight: 600 }}>{lga.status_assessed}</td>
                 <td style={tdStyle}>{lga.density_per_km2.toFixed(2)}</td>
                 <td style={tdStyle}>
-                  <span style={{
-                    padding: "2px 8px",
-                    borderRadius: 10,
-                    fontSize: 11,
-                    fontWeight: 600,
-                    background: lga.operational_rate_pct >= 70 ? "#E8F5E9" : lga.operational_rate_pct >= 40 ? "#FFF3E0" : "#FFEBEE",
-                    color: lga.operational_rate_pct >= 70 ? "#2E7D32" : lga.operational_rate_pct >= 40 ? "#E65100" : "#C62828",
-                  }}>
-                    {lga.operational_rate_pct}%
-                  </span>
+                  {lga.status_assessed > 0 ? (
+                    <span
+                      title={`${lga.operational} operational of ${lga.status_assessed} with a recorded status`}
+                      style={{
+                        padding: "2px 8px",
+                        borderRadius: 10,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        background: lga.operational_rate_pct >= 70 ? "#E8F5E9" : lga.operational_rate_pct >= 40 ? "#FFF3E0" : "#FFEBEE",
+                        color: lga.operational_rate_pct >= 70 ? "#2E7D32" : lga.operational_rate_pct >= 40 ? "#E65100" : "#C62828",
+                      }}
+                    >
+                      {lga.operational_rate_pct}%
+                    </span>
+                  ) : (
+                    <span style={{ color: "#bbb" }} title="No status recorded for any point in this LGA">—</span>
+                  )}
+                </td>
+                <td style={tdStyle} title={MODELLED_NOTE}>
+                  {lga.status_estimated > 0 ? (
+                    <span style={{ color: "#8D6E63", fontStyle: "italic" }}>
+                      ≈{lga.estimated_operational_rate_pct}%
+                    </span>
+                  ) : (
+                    <span style={{ color: "#bbb" }}>—</span>
+                  )}
                 </td>
                 <td style={tdStyle}>{lga.taps}</td>
                 <td style={tdStyle}>{lga.wells}</td>
                 <td style={tdStyle}>{lga.boreholes}</td>
+                <td style={tdStyle}>{lga.waterworks}</td>
               </tr>
             ))}
+            <tr style={{ borderTop: "2px solid #e0e0e0", background: "#FAFAFA", fontWeight: 700 }}>
+              <td style={tdStyle} />
+              <td style={tdStyle}>All LGAs</td>
+              <td style={tdStyle}>
+                {lgas.reduce((sum, l) => sum + l.area_km2, 0).toFixed(1)}
+              </td>
+              <td style={tdStyle}>{totals.total}</td>
+              <td style={{ ...tdStyle, color: STATUS_COLORS.operational }}>{totals.operational}</td>
+              <td style={{ ...tdStyle, color: STATUS_COLORS.broken }}>{totals.broken}</td>
+              <td style={{ ...tdStyle, color: STATUS_COLORS.unknown }}>{totals.unknown}</td>
+              <td style={tdStyle} title={MODELLED_NOTE}>
+                {totals.estimated > 0 ? (
+                  <span>
+                    <span style={{ color: "#2E7D32" }}>{totals.estimatedOperational}</span>
+                    {" / "}
+                    <span style={{ color: "#C62828" }}>{totals.estimatedBroken}</span>
+                  </span>
+                ) : (
+                  "—"
+                )}
+              </td>
+              <td style={tdStyle}>{totals.assessed}</td>
+              <td style={tdStyle} />
+              <td style={tdStyle}>
+                {totals.assessed > 0 ? `${((totals.operational / totals.assessed) * 100).toFixed(1)}%` : "—"}
+              </td>
+              <td style={tdStyle} title={MODELLED_NOTE}>
+                {totals.estimated > 0
+                  ? `≈${((totals.estimatedOperational / totals.estimated) * 100).toFixed(1)}%`
+                  : "—"}
+              </td>
+              <td style={tdStyle}>{lgas.reduce((sum, l) => sum + l.taps, 0)}</td>
+              <td style={tdStyle}>{lgas.reduce((sum, l) => sum + l.wells, 0)}</td>
+              <td style={tdStyle}>{lgas.reduce((sum, l) => sum + l.boreholes, 0)}</td>
+              <td style={tdStyle}>{lgas.reduce((sum, l) => sum + l.waterworks, 0)}</td>
+            </tr>
           </tbody>
         </table>
+        {unassigned > 0 && (
+          <p style={{ fontSize: 12, color: "#999", margin: "12px 0 0" }}>
+            {unassigned} point{unassigned === 1 ? "" : "s"} fall outside all LGA boundary polygons
+            and are excluded from the per-LGA rows above ({totals.total} inside + {unassigned}{" "}
+            outside = {grandTotal} total).
+          </p>
+        )}
       </div>
 
       {/* Density Heatmap Grid */}

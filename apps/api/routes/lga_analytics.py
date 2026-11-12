@@ -24,13 +24,16 @@ async def lga_analytics():
                 l.center_lat,
                 l.center_lon,
                 COUNT(wp.id) AS total_points,
-                COUNT(wp.id) FILTER (WHERE wp.status = 'operational') AS operational,
-                COUNT(wp.id) FILTER (WHERE wp.status = 'broken') AS broken,
+                COUNT(wp.id) FILTER (WHERE wp.status = 'operational' AND NOT wp.status_estimated) AS operational,
+                COUNT(wp.id) FILTER (WHERE wp.status = 'broken' AND NOT wp.status_estimated) AS broken,
                 COUNT(wp.id) FILTER (WHERE wp.status = 'unknown') AS unknown_status,
+                COUNT(wp.id) FILTER (WHERE wp.status = 'operational' AND wp.status_estimated) AS operational_estimated,
+                COUNT(wp.id) FILTER (WHERE wp.status = 'broken' AND wp.status_estimated) AS broken_estimated,
                 COUNT(wp.id) FILTER (WHERE wp.water_type = 'tap') AS taps,
                 COUNT(wp.id) FILTER (WHERE wp.water_type = 'well') AS wells,
                 COUNT(wp.id) FILTER (WHERE wp.water_type = 'borehole') AS boreholes,
                 COUNT(wp.id) FILTER (WHERE wp.water_type = 'spring') AS springs,
+                COUNT(wp.id) FILTER (WHERE wp.water_type = 'waterworks') AS waterworks,
                 COUNT(wp.id) FILTER (WHERE wp.source = 'osm') AS osm_points,
                 COUNT(wp.id) FILTER (WHERE wp.source = 'sample') AS sample_points,
                 COUNT(wp.id) FILTER (WHERE wp.source = 'crowdsourced') AS crowdsourced_points,
@@ -43,6 +46,11 @@ async def lga_analytics():
         result = await session.execute(query)
         rows = result.fetchall()
 
+        # Points outside every LGA polygon (coastal/offshore or borderline
+        # coordinates). Surfaced so per-LGA totals reconcile with the map total.
+        grand_total = await session.scalar(text("SELECT COUNT(*) FROM water_points"))
+        unassigned = grand_total - sum(row[4] for row in rows)
+
     lgas = []
     for row in rows:
         total = row[4]
@@ -50,7 +58,19 @@ async def lga_analytics():
         density = round(total / area, 2) if area > 0 else 0
         operational = row[5]
         broken = row[6]
-        operational_rate = round((operational / total * 100), 1) if total > 0 else 0
+        operational_estimated = row[8]
+        broken_estimated = row[9]
+        # Rate only over points whose status is actually recorded. GRID points
+        # carry no status, so dividing by `total` would report ~0% everywhere.
+        # Modelled (status_estimated) points are excluded and reported as their
+        # own rate — a 72% assumption is not a survey result.
+        assessed = operational + broken
+        operational_rate = round((operational / assessed * 100), 1) if assessed > 0 else 0
+        estimated_assessed = operational_estimated + broken_estimated
+        estimated_operational_rate = (
+            round((operational_estimated / estimated_assessed * 100), 1)
+            if estimated_assessed > 0 else 0
+        )
 
         lgas.append({
             "lga_name": row[0],
@@ -61,21 +81,29 @@ async def lga_analytics():
             "operational": operational,
             "broken": broken,
             "unknown_status": row[7],
+            "operational_estimated": operational_estimated,
+            "broken_estimated": broken_estimated,
+            "status_estimated": estimated_assessed,
+            "status_assessed": assessed,
             "density_per_km2": density,
             "operational_rate_pct": operational_rate,
-            "taps": row[8],
-            "wells": row[9],
-            "boreholes": row[10],
-            "springs": row[11],
-            "osm_points": row[12],
-            "sample_points": row[13],
-            "crowdsourced_points": row[14],
-            "grid_points": row[15],
+            "estimated_operational_rate_pct": estimated_operational_rate,
+            "taps": row[10],
+            "wells": row[11],
+            "boreholes": row[12],
+            "springs": row[13],
+            "waterworks": row[14],
+            "osm_points": row[15],
+            "sample_points": row[16],
+            "crowdsourced_points": row[17],
+            "grid_points": row[18],
         })
 
     return {
         "total_lgas": len(lgas),
         "total_points": sum(l["total_points"] for l in lgas),
+        "unassigned_points": unassigned,
+        "grand_total": grand_total,
         "lgas": lgas,
     }
 

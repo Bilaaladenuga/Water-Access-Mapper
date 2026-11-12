@@ -344,6 +344,7 @@ export default function MapView() {
                 <span>
                   <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${STATUS_COLORS[props.status] || "#9E9E9E"};margin-right:4px;"></span>
                   ${props.status}
+                  ${props.status_estimated ? '<span title="Modelled status: this point has no status in the source dataset, so the status is an assumption, not a survey" style="background:#FFE082;color:#6D4C41;padding:0 5px;border-radius:8px;font-size:9px;font-weight:700;margin-left:4px;">MODELLED</span>' : ""}
                 </span>
                 <span style="font-weight:500;color:#666;">Coords:</span>
                 <span>${props.latitude?.toFixed(4)}, ${props.longitude?.toFixed(4)}</span>

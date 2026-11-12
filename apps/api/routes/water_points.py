@@ -18,6 +18,7 @@ class WaterPointCount(BaseModel):
     by_status: dict[str, int]
     by_type: dict[str, int]
     by_source: dict[str, int]
+    status_estimated: int
 
 
 @router.get("/water-points/geojson")
@@ -43,6 +44,7 @@ async def get_water_points_geojson(
     query = f"""
         SELECT id, name, water_type, status, source,
                latitude, longitude,
+               COALESCE(status_estimated, false) AS status_estimated,
                ST_AsGeoJSON(geometry) as geojson
         FROM water_points
         {where_clause}
@@ -55,7 +57,7 @@ async def get_water_points_geojson(
 
     features = []
     for row in rows:
-        geo = json.loads(row[7])
+        geo = json.loads(row[8])
         features.append({
             "type": "Feature",
             "id": str(row[0]),
@@ -67,6 +69,7 @@ async def get_water_points_geojson(
                 "source": row[4],
                 "latitude": float(row[5]),
                 "longitude": float(row[6]),
+                "status_estimated": bool(row[7]),
             },
             "geometry": geo,
         })
@@ -96,8 +99,15 @@ async def get_water_points_stats():
         ))
         by_source = {row[0]: row[1] for row in result.fetchall()}
 
+        # Statuses modelled by assumption rather than recorded in the source.
+        result = await session.execute(text(
+            "SELECT COUNT(*) FROM water_points WHERE status_estimated = true"
+        ))
+        status_estimated = result.scalar()
+
     return WaterPointCount(
         total=total, by_status=by_status, by_type=by_type, by_source=by_source,
+        status_estimated=status_estimated,
     )
 
 

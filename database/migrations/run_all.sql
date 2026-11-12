@@ -130,5 +130,11 @@ ALTER TABLE water_quality
 CREATE INDEX IF NOT EXISTS idx_water_quality_is_simulated
     ON water_quality(is_simulated);
 
+ALTER TABLE water_points
+    ADD COLUMN IF NOT EXISTS status_estimated BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE INDEX IF NOT EXISTS idx_water_points_status_estimated
+    ON water_points(status_estimated);
+
 COMMENT ON TABLE water_quality
     IS 'Water quality test results: pH, turbidity, coliform, conductivity';
