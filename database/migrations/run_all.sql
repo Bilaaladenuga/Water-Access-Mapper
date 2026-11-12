@@ -84,3 +84,51 @@ CREATE INDEX IF NOT EXISTS idx_water_point_reports_resolved
     ON water_point_reports(resolved);
 
 COMMENT ON TABLE water_point_reports IS 'Crowdsourced reports: new points, broken points, incorrect locations';
+
+-- ============================================================
+-- 5. GRID dataset fields + stable external identifiers
+-- ============================================================
+ALTER TABLE water_points
+    ADD COLUMN IF NOT EXISTS external_id VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS ward_code VARCHAR(30),
+    ADD COLUMN IF NOT EXISTS lga VARCHAR(100);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_water_points_source_external_id
+    ON water_points(source, external_id);
+
+CREATE INDEX IF NOT EXISTS idx_water_points_ward_code
+    ON water_points(ward_code);
+
+-- ============================================================
+-- 6. Water Quality Table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS water_quality (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    water_point_id UUID NOT NULL REFERENCES water_points(id) ON DELETE CASCADE,
+    test_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    ph NUMERIC(4, 2),
+    turbidity NUMERIC(8, 2),
+    coliform_count INTEGER,
+    conductivity NUMERIC(8, 2),
+    temperature NUMERIC(5, 2),
+    status VARCHAR(20) NOT NULL DEFAULT 'unknown',
+    notes TEXT,
+    tested_by VARCHAR(255) DEFAULT 'anonymous',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_water_quality_water_point
+    ON water_quality(water_point_id);
+CREATE INDEX IF NOT EXISTS idx_water_quality_test_date
+    ON water_quality(test_date DESC);
+CREATE INDEX IF NOT EXISTS idx_water_quality_status
+    ON water_quality(status);
+
+ALTER TABLE water_quality
+    ADD COLUMN IF NOT EXISTS is_simulated BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE INDEX IF NOT EXISTS idx_water_quality_is_simulated
+    ON water_quality(is_simulated);
+
+COMMENT ON TABLE water_quality
+    IS 'Water quality test results: pH, turbidity, coliform, conductivity';

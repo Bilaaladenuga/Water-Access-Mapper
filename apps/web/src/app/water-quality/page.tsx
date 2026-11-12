@@ -20,6 +20,7 @@ function useMediaQuery(query: string) {
 interface LGALevel {
   lga_name: string;
   points_tested: number;
+  simulated_tests: number;
   avg_ph: number | null;
   avg_turbidity: number | null;
   avg_coliform: number | null;
@@ -32,12 +33,15 @@ interface LGALevel {
     coliform_count: number;
     quality_status: string;
     test_date: string | null;
+    is_simulated: boolean;
   }[];
 }
 
 interface Summary {
   total_tested_points: number;
   by_status: Record<string, number>;
+  simulated_tests?: number;
+  measured_tests?: number;
   averages: {
     ph: number | null;
     turbidity: number | null;
@@ -96,8 +100,19 @@ export default function WaterQualityPage() {
   }
 
   const allPoints = lgaData.flatMap((l) => l.points);
-  const maxColiform = Math.max(...allPoints.map((p) => p.coliform_count), 1);
-  const maxTurbidity = Math.max(...allPoints.map((p) => p.turbidity || 0), 1);
+  const STATUS_RANK: Record<string, number> = { poor: 0, moderate: 1, good: 2 };
+  const CHART_LIMIT = 60;
+  // 1,000+ points would render thousands of rows; show the worst results and
+  // let the LGA table carry the aggregate view.
+  const chartPoints = [...allPoints]
+    .sort(
+      (a, b) =>
+        (STATUS_RANK[a.quality_status] ?? 3) - (STATUS_RANK[b.quality_status] ?? 3) ||
+        b.coliform_count - a.coliform_count
+    )
+    .slice(0, CHART_LIMIT);
+  const maxColiform = Math.max(...chartPoints.map((p) => p.coliform_count), 1);
+  const maxTurbidity = Math.max(...chartPoints.map((p) => p.turbidity || 0), 1);
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 1200, margin: "0 auto", padding: isMobile ? "12px 8px" : "24px 16px" }}>
@@ -118,6 +133,17 @@ export default function WaterQualityPage() {
           </Link>
         </div>
       </div>
+
+      {/* Simulated data notice */}
+      {(summary?.simulated_tests ?? 0) > 0 && (
+        <div style={{ background: "#ECEFF1", border: "1px solid #B0BEC5", borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 13 }}>
+          <strong>⚠️ Demo data:</strong> {summary?.simulated_tests} of{" "}
+          {(summary?.simulated_tests ?? 0) + (summary?.measured_tests ?? 0)} test records are
+          generated values, not field measurements. They are tagged{" "}
+          <em>SIMULATED</em> in the database, popups and tables. Real tests are shown
+          alongside them and can be distinguished by the tag.
+        </div>
+      )}
 
       {/* Summary Cards */}
       {summary && (
@@ -174,6 +200,14 @@ export default function WaterQualityPage() {
         </div>
       )}
 
+      {/* Chart subset notice */}
+      {allPoints.length > chartPoints.length && (
+        <div style={{ background: "#E3F2FD", border: "1px solid #BBDEFB", borderRadius: 12, padding: 12, marginBottom: 16, fontSize: 12, color: "#0D47A1" }}>
+          Showing the <strong>{chartPoints.length} worst</strong> results of {allPoints.length} tested
+          points. The full aggregate by LGA is in the table below.
+        </div>
+      )}
+
       {/* pH Chart */}
       <div style={{ background: "white", borderRadius: 12, padding: 20, marginBottom: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
         <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600 }}>⚗️ pH Levels by Water Point</h3>
@@ -191,7 +225,7 @@ export default function WaterQualityPage() {
             borderRight: "2px dashed #4CAF50",
           }} />
           {/* pH bars */}
-          {allPoints.map((p, i) => (
+          {chartPoints.map((p, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", height: isMobile ? 18 : 22, gap: 8 }}>
               <div style={{ width: isMobile ? 80 : 140, fontSize: 10, textAlign: "right", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={p.name}>
                 {p.name}
@@ -237,7 +271,7 @@ export default function WaterQualityPage() {
             background: "#F44336",
             zIndex: 1,
           }} />
-          {allPoints.map((p, i) => (
+          {chartPoints.map((p, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", height: isMobile ? 18 : 22, gap: 8 }}>
               <div style={{ width: isMobile ? 80 : 140, fontSize: 10, textAlign: "right", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={p.name}>
                 {p.name}
@@ -265,7 +299,7 @@ export default function WaterQualityPage() {
       <div style={{ background: "white", borderRadius: 12, padding: 20, marginBottom: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
         <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600 }}>🦠 Coliform Count (CFU/100ml)</h3>
         <p style={{ margin: "0 0 16px", fontSize: 11, color: "#666" }}>WHO standard = 0 for safe drinking water · All bars exceed the limit</p>
-        {allPoints.map((p, i) => (
+        {chartPoints.map((p, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", height: isMobile ? 18 : 22, gap: 8 }}>
             <div style={{ width: isMobile ? 80 : 140, fontSize: 10, textAlign: "right", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={p.name}>
               {p.name}
@@ -310,7 +344,14 @@ export default function WaterQualityPage() {
                 onClick={() => setSelectedLGA(selectedLGA === lga.lga_name ? null : lga.lga_name)}
               >
                 <td style={{ ...tdStyle, fontWeight: 600 }}>{lga.lga_name}</td>
-                <td style={tdStyle}>{lga.points_tested}</td>
+                <td style={tdStyle}>
+                  {lga.points_tested}
+                  {lga.simulated_tests > 0 && (
+                    <span style={{ color: "#90A4AE", fontSize: 10, marginLeft: 4 }}>
+                      ({lga.simulated_tests} sim)
+                    </span>
+                  )}
+                </td>
                 <td style={{ ...tdStyle, color: lga.avg_ph && lga.avg_ph >= WHO.ph_min && lga.avg_ph <= WHO.ph_max ? "#4CAF50" : "#F44336" }}>
                   {lga.avg_ph}
                 </td>
@@ -341,6 +382,11 @@ export default function WaterQualityPage() {
                 <div>
                   <span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>
                   <span style={{ color: "#999", fontSize: 11, marginLeft: 8 }}>({p.water_type} · {p.test_date})</span>
+                  {p.is_simulated && (
+                    <span style={{ background: "#455A64", color: "white", fontSize: 9, fontWeight: 600, padding: "1px 5px", borderRadius: 8, marginLeft: 6 }}>
+                      SIM
+                    </span>
+                  )}
                 </div>
                 <div style={{ display: "flex", gap: 8, fontSize: 11 }}>
                   <span>pH: <strong>{p.ph}</strong></span>

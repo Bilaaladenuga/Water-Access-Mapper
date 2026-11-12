@@ -33,7 +33,8 @@ async def lga_analytics():
                 COUNT(wp.id) FILTER (WHERE wp.water_type = 'spring') AS springs,
                 COUNT(wp.id) FILTER (WHERE wp.source = 'osm') AS osm_points,
                 COUNT(wp.id) FILTER (WHERE wp.source = 'sample') AS sample_points,
-                COUNT(wp.id) FILTER (WHERE wp.source = 'crowdsourced') AS crowdsourced_points
+                COUNT(wp.id) FILTER (WHERE wp.source = 'crowdsourced') AS crowdsourced_points,
+                COUNT(wp.id) FILTER (WHERE wp.source = 'grid') AS grid_points
             FROM lga_boundaries l
             LEFT JOIN water_points wp ON ST_Contains(l.geometry, wp.geometry)
             GROUP BY l.name, l.area_sqkm, l.center_lat, l.center_lon
@@ -69,6 +70,7 @@ async def lga_analytics():
             "osm_points": row[12],
             "sample_points": row[13],
             "crowdsourced_points": row[14],
+            "grid_points": row[15],
         })
 
     return {

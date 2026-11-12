@@ -22,9 +22,17 @@ const WATER_TYPE_COLORS: Record<string, string> = {
   tap: "#2196F3",
   well: "#4CAF50",
   borehole: "#FF9800",
+  waterworks: "#00897B",
   spring: "#9C27B0",
   rainwater: "#00BCD4",
   other: "#607D8B",
+};
+
+const SOURCE_BADGES: Record<string, { label: string; color: string }> = {
+  osm: { label: "OSM", color: "#1976D2" },
+  grid: { label: "GRID", color: "#6A1B9A" },
+  crowdsourced: { label: "Community", color: "#2E7D32" },
+  sample: { label: "Sample", color: "#FF9800" },
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -265,13 +273,7 @@ export default function MapView() {
           layout: { visibility: "none" },
           maxzoom: 15,
           paint: {
-            "heatmap-weight": [
-              "interpolate",
-              ["linear"],
-              ["get", "importance"],
-              0, 0,
-              6, 1,
-            ],
+            "heatmap-weight": 1,
             "heatmap-intensity": [
               "interpolate",
               ["linear"],
@@ -321,16 +323,16 @@ export default function MapView() {
           const props = feature.properties as any;
           const coords = (feature.geometry as any).coordinates;
 
-          const sourceBadge =
-            props.source === "osm"
-              ? '<span style="background:#1976D2;color:white;padding:1px 6px;border-radius:10px;font-size:10px;">OSM</span>'
-              : '<span style="background:#FF9800;color:white;padding:1px 6px;border-radius:10px;font-size:10px;">Sample</span>';
+          const badge = SOURCE_BADGES[props.source] ?? {
+            label: props.source ?? "Unknown",
+            color: "#607D8B",
+          };
 
           const html = `
             <div style="font-family:system-ui,sans-serif;padding:4px;">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
                 <h3 style="margin:0;font-size:14px;font-weight:600;flex:1;">${props.name}</h3>
-                ${sourceBadge}
+                <span style="background:${badge.color};color:white;padding:1px 6px;border-radius:10px;font-size:10px;">${badge.label}</span>
               </div>
               <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 8px;font-size:12px;margin-bottom:10px;">
                 <span style="font-weight:500;color:#666;">Type:</span>
@@ -368,11 +370,15 @@ export default function MapView() {
               if (qData.count > 0 && popupRef.current) {
                 const q = qData.quality[0]; // latest result
                 const statusColor = q.status === "good" ? "#4CAF50" : q.status === "moderate" ? "#FF9800" : "#F44336";
+                const simulatedChip = q.is_simulated
+                  ? '<span style="background:#455A64;color:white;padding:1px 6px;border-radius:10px;font-size:10px;">SIMULATED</span>'
+                  : "";
                 const qualityHtml = `
                   <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
                       <span style="font-weight:600;font-size:12px;">💧 Water Quality</span>
                       <span style="background:${statusColor};color:white;padding:1px 6px;border-radius:10px;font-size:10px;text-transform:capitalize;">${q.status}</span>
+                      ${simulatedChip}
                     </div>
                     <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:11px;color:#555;">
                       <span>pH:</span><span>${q.ph?.toFixed(1) ?? "—"}</span>
@@ -835,7 +841,8 @@ export default function MapView() {
             💧 Water Points: {stats.total}
           </div>
           <div style={{ color: "#666", fontSize: 11 }}>
-            {stats.by_source?.osm || 0} OSM · {stats.by_source?.sample || 0} Sample
+            {stats.by_source?.osm || 0} OSM · {stats.by_source?.grid || 0} GRID ·{" "}
+            {stats.by_source?.sample || 0} Sample
           </div>
           <a
             href="/analytics"
@@ -953,6 +960,7 @@ export default function MapView() {
           <option value="tap">Tap</option>
           <option value="well">Well</option>
           <option value="borehole">Borehole</option>
+          <option value="waterworks">Waterworks</option>
           <option value="spring">Spring</option>
         </select>
 

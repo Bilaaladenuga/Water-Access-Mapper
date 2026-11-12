@@ -15,7 +15,7 @@ from shapely.validation import make_valid
 
 
 # Valid water types (matches database constraints)
-VALID_WATER_TYPES = {"well", "tap", "spring", "borehole", "rainwater", "other"}
+VALID_WATER_TYPES = {"well", "tap", "spring", "borehole", "waterworks", "rainwater", "other"}
 
 # Valid statuses
 VALID_STATUSES = {"operational", "broken", "unknown", "abandoned"}

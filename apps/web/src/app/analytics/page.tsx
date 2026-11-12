@@ -276,7 +276,7 @@ export default function AnalyticsPage() {
             <StatCard title="Total Water Points" value={summary.total_water_points} color="#1976D2" />
             <StatCard title="Operational" value={summary.by_status.operational || 0} subtitle={`${summary.operational_rate}% operational rate`} color="#4CAF50" />
             <StatCard title="Broken" value={summary.by_status.broken || 0} color="#F44336" />
-            <StatCard title="Data Sources" value={Object.keys(summary.by_source).length} subtitle={`${summary.by_source.osm || 0} OSM + ${summary.by_source.sample || 0} sample`} color="#FF9800" />
+            <StatCard title="Data Sources" value={Object.keys(summary.by_source).length} subtitle={`${summary.by_source.osm || 0} OSM + ${summary.by_source.grid || 0} GRID + ${summary.by_source.sample || 0} sample`} color="#FF9800" />
             <StatCard title="Pending Reviews" value={summary.pending_submissions} subtitle={`${summary.unresolved_reports} unresolved reports`} color="#9C27B0" />
           </div>
         )}

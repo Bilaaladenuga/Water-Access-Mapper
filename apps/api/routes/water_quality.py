@@ -35,7 +35,8 @@ async def get_quality_for_point(water_point_id: str):
         result = await session.execute(
             text("""
                 SELECT id, test_date, ph, turbidity, coliform_count,
-                       conductivity, temperature, status, notes, tested_by
+                       conductivity, temperature, status, notes, tested_by,
+                       is_simulated
                 FROM water_quality
                 WHERE water_point_id = :wp_id
                 ORDER BY test_date DESC
@@ -60,6 +61,7 @@ async def get_quality_for_point(water_point_id: str):
             "status": row[7],
             "notes": row[8],
             "tested_by": row[9],
+            "is_simulated": bool(row[10]),
         })
 
     return {"quality": quality, "count": len(quality)}
@@ -80,6 +82,19 @@ async def get_quality_summary():
             text("SELECT status, COUNT(*) FROM water_quality GROUP BY status ORDER BY status")
         )
         by_status = {row[0]: row[1] for row in result.fetchall()}
+
+        # Simulated vs. real test counts
+        result = await session.execute(
+            text(
+                """
+                SELECT
+                    COUNT(*) FILTER (WHERE is_simulated) AS simulated,
+                    COUNT(*) FILTER (WHERE NOT is_simulated) AS measured
+                FROM water_quality
+                """
+            )
+        )
+        simulated, measured = result.fetchone()
 
         # Average metrics
         result = await session.execute(text("""
@@ -104,6 +119,7 @@ async def get_quality_summary():
                 ORDER BY test_date DESC LIMIT 1
             )
             ORDER BY wq.test_date DESC
+            LIMIT 50
         """))
         latest = []
         for row in result.fetchall():
@@ -120,6 +136,8 @@ async def get_quality_summary():
     return {
         "total_tested_points": total_tested,
         "by_status": by_status,
+        "simulated_tests": simulated,
+        "measured_tests": measured,
         "averages": {
             "ph": round(float(avgs[0]), 1) if avgs[0] else None,
             "turbidity": round(float(avgs[1]), 1) if avgs[1] else None,
@@ -138,7 +156,7 @@ async def get_quality_by_lga():
             SELECT DISTINCT ON (wq.water_point_id)
                 wq.water_point_id, wq.ph, wq.turbidity, wq.coliform_count,
                 wq.status as quality_status, wq.test_date,
-                wp.name, wp.water_type, wp.lga
+                wp.name, wp.water_type, wp.lga, wq.is_simulated
             FROM water_quality wq
             JOIN water_points wp ON wq.water_point_id = wp.id
             ORDER BY wq.water_point_id, wq.test_date DESC
@@ -153,6 +171,7 @@ async def get_quality_by_lga():
             lga_data[lga] = {
                 "lga_name": lga,
                 "points_tested": 0,
+                "simulated_tests": 0,
                 "avg_ph": [],
                 "avg_turbidity": [],
                 "avg_coliform": [],
@@ -161,6 +180,8 @@ async def get_quality_by_lga():
             }
         entry = lga_data[lga]
         entry["points_tested"] += 1
+        if row[9]:
+            entry["simulated_tests"] += 1
         if row[1] is not None:
             entry["avg_ph"].append(float(row[1]))
         if row[2] is not None:
@@ -177,6 +198,7 @@ async def get_quality_by_lga():
             "coliform_count": row[3],
             "quality_status": status,
             "test_date": row[5].isoformat() if row[5] else None,
+            "is_simulated": bool(row[9]),
         })
 
     # Calculate averages
@@ -203,7 +225,8 @@ async def get_quality_geojson():
                 wq.water_point_id, wq.ph, wq.turbidity, wq.coliform_count,
                 wq.status as quality_status, wq.test_date,
                 wp.name, wp.water_type, wp.latitude, wp.longitude,
-                ST_AsGeoJSON(wp.geometry) as geojson
+                ST_AsGeoJSON(wp.geometry) as geojson,
+                wq.is_simulated
             FROM water_quality wq
             JOIN water_points wp ON wq.water_point_id = wp.id
             ORDER BY wq.water_point_id, wq.test_date DESC
@@ -224,6 +247,7 @@ async def get_quality_geojson():
                 "coliform_count": row[3],
                 "quality_status": row[4],
                 "test_date": row[5].isoformat() if row[5] else None,
+                "is_simulated": bool(row[11]),
             },
             "geometry": {
                 "type": "Point",

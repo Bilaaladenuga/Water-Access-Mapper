@@ -4,15 +4,24 @@ Usage: python scripts/run_migration.py
 """
 
 import asyncio
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 
+load_dotenv(Path(__file__).parent.parent / "apps" / "api" / ".env")
 
-DATABASE_URL = (
-    "postgresql+asyncpg://neondb_owner:npg_D5vLKF1paIUu"
-    "@ep-purple-mountain-zata3wty-pooler.c-2.eu-west-2.aws.neon.tech"
-    "/neondb?ssl=require"
-)
+
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+if not DATABASE_URL:
+    raise SystemExit("DATABASE_URL is not set. Create apps/api/.env from .env.example first.")
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+DATABASE_URL = DATABASE_URL.replace("sslmode=require", "ssl=require")
+if "channel_binding" in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("&channel_binding=require", "")
 
 
 async def run_migration():

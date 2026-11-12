@@ -31,6 +31,7 @@ interface LGAData {
   osm_points: number;
   sample_points: number;
   crowdsourced_points: number;
+  grid_points: number;
 }
 
 interface LGASummary {
