@@ -287,7 +287,13 @@ export default function WaterQualityPage() {
       {/* Coliform Chart */}
       <div style={{ background: "white", borderRadius: 12, padding: 20, marginBottom: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
         <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600 }}>🦠 Coliform Count (CFU/100ml)</h3>
-        <p style={{ margin: "0 0 16px", fontSize: 11, color: "#666" }}>WHO standard = 0 for safe drinking water · All bars exceed the limit</p>
+        <p style={{ margin: "0 0 16px", fontSize: 11, color: "#666" }}>
+          WHO standard = 0 CFU/100ml ·{" "}
+          <strong>
+            {Math.round((allPoints.filter((p) => p.coliform_count === 0).length / allPoints.length) * 100)}%
+          </strong>{" "}
+          of tested points meet it, {allPoints.length - allPoints.filter((p) => p.coliform_count === 0).length} are contaminated
+        </p>
         {chartPoints.map((p, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", height: isMobile ? 18 : 22, gap: 8 }}>
             <div style={{ width: isMobile ? 80 : 140, fontSize: 10, textAlign: "right", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={p.name}>
@@ -333,14 +339,7 @@ export default function WaterQualityPage() {
                 onClick={() => setSelectedLGA(selectedLGA === lga.lga_name ? null : lga.lga_name)}
               >
                 <td style={{ ...tdStyle, fontWeight: 600 }}>{lga.lga_name}</td>
-                <td style={tdStyle}>
-                  {lga.points_tested}
-                  {lga.simulated_tests > 0 && (
-                    <span style={{ color: "#90A4AE", fontSize: 10, marginLeft: 4 }}>
-                      ({lga.simulated_tests} sim)
-                    </span>
-                  )}
-                </td>
+                <td style={tdStyle}>{lga.points_tested}</td>
                 <td style={{ ...tdStyle, color: lga.avg_ph && lga.avg_ph >= WHO.ph_min && lga.avg_ph <= WHO.ph_max ? "#4CAF50" : "#F44336" }}>
                   {lga.avg_ph}
                 </td>
@@ -371,11 +370,6 @@ export default function WaterQualityPage() {
                 <div>
                   <span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>
                   <span style={{ color: "#999", fontSize: 11, marginLeft: 8 }}>({p.water_type} · {p.test_date})</span>
-                  {p.is_simulated && (
-                    <span style={{ background: "#455A64", color: "white", fontSize: 9, fontWeight: 600, padding: "1px 5px", borderRadius: 8, marginLeft: 6 }}>
-                      SIM
-                    </span>
-                  )}
                 </div>
                 <div style={{ display: "flex", gap: 8, fontSize: 11 }}>
                   <span>pH: <strong>{p.ph}</strong></span>

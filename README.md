@@ -35,7 +35,7 @@
 
 ### 💧 Water Quality Analysis
 ![Water Quality](docs/screenshots/water-quality.png)
-*WHO drinking water guideline compliance with pH, turbidity, and coliform charts across tested LGAs. The additional GRID quality records are simulated demo values, clearly tagged as such in the UI.*
+*WHO drinking water guideline compliance with pH, turbidity, and coliform charts across tested LGAs. GRID quality records are synthetic and calibrated to the WASHNORM 2021 Lagos contamination rate (see [Data Sources](#-data-sources)).*
 
 ### 📱 Mobile Responsive
 ![Mobile View](docs/screenshots/mobile-view.png)
@@ -74,14 +74,22 @@ Access to clean water remains a critical challenge in Lagos State, Nigeria — a
 | **Water quality tested** | 1,195 points (1,180 simulated + 15 measured) |
 
 > **Simulated data notice.** The GRID baseline CSV carries no water quality
-> attributes and no operational status. To make the quality views
-> demonstrable, 1,180 synthetic test results were generated for those points.
+> attributes and no operational status — verified against the authoritative
+> GRID3 Nigeria FeatureServer, whose 16 attributes contain neither. To make the
+> quality views demonstrable, 1,180 synthetic test results were generated for
+> those points, **calibrated so that exactly 34% carry an E. coli contamination**
+> (`coliform_count > 0`), the published Lagos State figure from **WASHNORM 2021,
+> Lagos State Fact Sheet** (FMWR / NBS / UNICEF / World Bank, June 2022). Among
+> contaminated points the CFU/100ml bands follow the WASHNORM concentration
+> scale. pH and turbidity are separate WHO parameters with no Lagos-specific
+> published distribution, so they are varied plausibly rather than calibrated.
+>
 > Every generated record is stored with `is_simulated = TRUE`, attributed to
 > `simulated-demo`, and carries the note *"SIMULATED — synthetic demo data, not
-> a field measurement"*. They are tagged **SIMULATED** in map popups and
-> **SIM** in the quality tables, and can be removed with
-> `python scripts/seed_demo_quality.py --clear`. The 15 real test results are
-> never modified. None of the simulated values are field measurements.
+> a field measurement"*. The flag is returned by the API on every record, but
+> the dashboards do not render it as an on-screen tag. Remove the synthetic set
+> with `python scripts/seed_demo_quality.py --clear`. The 15 real test results
+> are never modified. None of the simulated values are field measurements.
 
 ---
 
@@ -333,8 +341,8 @@ Tests run against the live API with real PostGIS queries.
 ## ⚠️ Limitations
 
 1. **Sample data** — 89 of 1,339 points are fabricated for demonstration (clearly labeled)
-2. **Simulated water quality** — 1,180 of the 1,195 quality records are generated demo values (`is_simulated = TRUE`), not field measurements. Only 15 records are real. Remove the synthetic set with `scripts/seed_demo_quality.py --clear`.
-3. **Status coverage** — only 79 of 1,339 points have a *recorded* operational status (from the sample dataset). GRID records no functionality, so 1,180 GRID points carry a **modelled** status from a documented 72% operational assumption (`scripts/estimate_grid_status.py`, flagged `status_estimated = TRUE`). Every dashboard, table and map popup separates recorded from modelled status, and the recorded operational rate is calculated over the 79 assessed points only. OSM (69) and 1 crowdsourced point remain `unknown`. Revert the modelled statuses with `python scripts/estimate_grid_status.py --clear`.
+2. **Simulated water quality** — 1,180 of the 1,195 quality records are generated values (`is_simulated = TRUE`), not field measurements. Only 15 records are real. The synthetic set is **calibrated to WASHNORM 2021**: exactly 34% of GRID points are flagged E. coli contaminated, matching the published Lagos State rate, so the headline contamination figure traces to an official source even though the per-point assignment does not. pH and turbidity are plausible, not calibrated. The `is_simulated` flag is returned by the API on every record; the UI no longer renders it as a tag. Remove the synthetic set with `scripts/seed_demo_quality.py --clear`.
+3. **Status coverage** — only 79 of 1,339 points have a *recorded* operational status (from the sample dataset). GRID records no functionality, so 1,180 GRID points carry a **modelled** status from a documented 72% operational assumption (`scripts/estimate_grid_status.py`, flagged `status_estimated = TRUE`). Analytics and the LGA table separate recorded from modelled status, and the recorded operational rate is calculated over the 79 assessed points only; map popups no longer show the modelled marker. OSM (69) and 1 crowdsourced point remain `unknown`. Revert the modelled statuses with `python scripts/estimate_grid_status.py --clear`.
 4. **OSM coverage** — OpenStreetMap data varies by region; rural areas may have fewer mapped points
 5. **Routing** — OSRM routing is based on the OSM road network; informal paths may not be included
 6. **Water quality coverage** — 15 real tested points, not comprehensive testing

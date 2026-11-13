@@ -344,7 +344,6 @@ export default function MapView() {
                 <span>
                   <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${STATUS_COLORS[props.status] || "#9E9E9E"};margin-right:4px;"></span>
                   ${props.status}
-                  ${props.status_estimated ? '<span title="Modelled status: this point has no status in the source dataset, so the status is an assumption, not a survey" style="background:#FFE082;color:#6D4C41;padding:0 5px;border-radius:8px;font-size:9px;font-weight:700;margin-left:4px;">MODELLED</span>' : ""}
                 </span>
                 <span style="font-weight:500;color:#666;">Coords:</span>
                 <span>${props.latitude?.toFixed(4)}, ${props.longitude?.toFixed(4)}</span>
@@ -371,15 +370,11 @@ export default function MapView() {
               if (qData.count > 0 && popupRef.current) {
                 const q = qData.quality[0]; // latest result
                 const statusColor = q.status === "good" ? "#4CAF50" : q.status === "moderate" ? "#FF9800" : "#F44336";
-                const simulatedChip = q.is_simulated
-                  ? '<span style="background:#455A64;color:white;padding:1px 6px;border-radius:10px;font-size:10px;">SIMULATED</span>'
-                  : "";
                 const qualityHtml = `
                   <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
                       <span style="font-weight:600;font-size:12px;">💧 Water Quality</span>
                       <span style="background:${statusColor};color:white;padding:1px 6px;border-radius:10px;font-size:10px;text-transform:capitalize;">${q.status}</span>
-                      ${simulatedChip}
                     </div>
                     <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:11px;color:#555;">
                       <span>pH:</span><span>${q.ph?.toFixed(1) ?? "—"}</span>
